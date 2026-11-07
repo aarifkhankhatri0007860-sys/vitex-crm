@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reports & Analytics | Vitex CRM</title>
+<style>
+:root{--blue:#1769e0;--dark:#172b46;--bg:#f4f7fc;--muted:#718096;--border:#e5eaf2;--green:#159b69;--orange:#d88718;--red:#dc4b4b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--dark)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:white;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:5px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px}
+.nav a{display:block;text-decoration:none;color:#536278;padding:12px 13px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:26px 30px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:25px;margin:0}
+.sub{font-size:13px;color:var(--muted);margin-top:7px}
+.user{font-size:13px;color:var(--muted)}
+button,select{border:0;border-radius:8px;padding:11px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.primary{background:var(--blue);color:white}
+.secondary{background:#eaf2ff;color:var(--blue)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.card,.panel{background:white;border:1px solid var(--border);border-radius:13px;padding:18px}
+.card span{font-size:12px;color:var(--muted)}
+.card strong{display:block;font-size:26px;margin-top:10px;overflow-wrap:anywhere}
+.card small{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:17px;margin-bottom:18px}
+.panel h2{font-size:16px;margin:0 0 18px}
+.chart{height:220px;display:flex;align-items:end;gap:9px;padding:12px 4px 25px;border-bottom:1px solid var(--border);overflow-x:auto}
+.bar-col{height:100%;min-width:28px;flex:1;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:7px}
+.bar{width:min(35px,80%);background:linear-gradient(180deg,#4d9bff,#1769e0);border-radius:6px 6px 0 0;min-height:2px}
+.bar-label{font-size:10px;color:var(--muted);white-space:nowrap}
+.bar-value{font-size:10px;color:#526174;white-space:nowrap}
+.status-list{display:grid;gap:15px}
+.status-row{display:grid;grid-template-columns:110px 1fr 35px;align-items:center;gap:9px;font-size:12px}
+.track{height:9px;background:#edf1f6;border-radius:20px;overflow:hidden}
+.fill{height:100%;border-radius:20px;background:var(--blue)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:450px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid var(--border);font-size:13px}
+th{font-size:11px;color:var(--muted);background:#fafbfd}
+.empty{text-align:center;color:var(--muted);padding:25px}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-bottom:18px}
+.tag{display:inline-block;border-radius:20px;background:#eaf2ff;color:var(--blue);padding:5px 9px;font-size:11px;font-weight:700}
+.warning{color:var(--orange)}
+.success{color:var(--green)}
+#error{font-size:13px;color:var(--red);margin-bottom:12px}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.bottom-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:4px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.stats{gap:9px}.card{padding:13px}.card strong{font-size:22px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">VITEX CRM<small>BUSINESS MANAGEMENT</small></div>
+<nav class="nav">
+<a href="dashboard.html">Dashboard</a>
+<a href="customers.html">Customers</a>
+<a href="orders.html">Orders</a>
+<a href="products.html">Products</a>
+<a href="shipping.html">Shipping</a>
+<a href="invoices.html">Invoices</a>
+<a href="followups.html">Follow-ups</a>
+<a class="active" href="reports.html">Reports</a>
+<a id="settingsLink" href="settings.html">Settings</a>
+<a href="#" id="logoutBtn">Logout</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="top">
+<div><h1>Reports & Analytics</h1><div class="sub">Your business performance at a glance.</div></div>
+<div>
+<span class="user" id="userInfo">Loading...</span>
+<button class="primary" id="exportBtn">Download CSV</button>
+</div>
+</div>
+<div id="error"></div>
+
+<div class="stats">
+<div class="card"><span>Total Customers</span><strong id="customersCount">0</strong><small>Customer records</small></div>
+<div class="card"><span>Total Orders</span><strong id="ordersCount">0</strong><small>All order records</small></div>
+<div class="card"><span>Total Sales</span><strong id="salesTotal">₹0</strong><small>Based on saved orders</small></div>
+<div class="card"><span>Collected Payments</span><strong id="paidTotal">₹0</strong><small>Based on order payment status</small></div>
+</div>
+
+<div class="stats">
+<div class="card"><span>Pending Payments</span><strong id="pendingTotal">₹0</strong><small>Estimated unpaid balance</small></div>
+<div class="card"><span>Total Products</span><strong id="productsCount">0</strong><small>Product catalogue</small></div>
+<div class="card"><span>Low Stock Products</span><strong id="lowStockCount" class="warning">0</strong><small>At or below low-stock limit</small></div>
+<div class="card"><span>Follow-ups Completed</span><strong id="followupsCount">0</strong><small>Completed follow-up records</small></div>
+</div>
+
+<div class="grid">
+<section class="panel">
+<h2>Monthly Sales</h2>
+<div class="sub" style="margin-bottom:12px">Sales grouped by order date for the last 6 months.</div>
+<div class="chart" id="salesChart"><div class="empty">Loading chart...</div></div>
+</section>
+<section class="panel">
+<h2>Order Status Overview</h2>
+<div class="status-list" id="statusList"><div class="empty">Loading...</div></div>
+</section>
+</div>
+
+<div class="bottom-grid">
+<section class="panel">
+<h2>Payment Overview</h2>
+<div class="status-list" id="paymentList"></div>
+</section>
+<section class="panel">
+<h2>Follow-up Overview</h2>
+<div class="status-list" id="followupList"></div>
+</section>
+</div>
+
+<section class="panel" style="margin-bottom:18px">
+<h2>Recent Orders</h2>
+<div class="table-wrap">
+<table><thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Amount</th><th>Status</th><th>Payment</th></tr></thead>
+<tbody id="recentOrders"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody></table>
+</div>
+</section>
+
+<section class="panel">
+<h2>Inventory Summary</h2>
+<div class="table-wrap">
+<table><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Low Stock Limit</th><th>Stock Value</th></tr></thead>
+<tbody id="inventoryRows"><tr><td colspan="5" class="empty">Loading...</td></tr></tbody></table>
+</div>
+</section>
+</main>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,getDocs} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const $=id=>document.getElementById(id);
+let reportData={customers:[],orders:[],products:[],followups:[],invoices:[]};
+
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=n=>Number(n)||0;
+const orderAmount=o=>num(o.totalAmount??o.total??o.grandTotal);
+const orderDate=o=>String(o.orderDate||o.createdAt?.toDate?.()?.toISOString()||"").slice(0,10);
+
+function setText(id,value){$(id).textContent=value}
+function barChart(months){
+ const max=Math.max(1,...months.map(m=>m.total));
+ $("salesChart").innerHTML=months.map(m=>{
+  const h=Math.max(m.total?4:2,m.total/max*145);
+  return `<div class="bar-col"><div class="bar-value">${m.total?money(m.total):"₹0"}</div><div class="bar" style="height:${h}px"></div><div class="bar-label">${m.label}</div></div>`;
+ }).join("");
+}
+function renderStatus(){
+ const orders=reportData.orders;
+ const labels=["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled","Other"];
+ const counts=labels.map(label=>({label,count:label==="Other"?orders.filter(o=>!labels.slice(0,-1).includes(o.status)).length:orders.filter(o=>(o.status||"Pending")===label).length}));
+ const total=Math.max(1,orders.length);
+ $("statusList").innerHTML=counts.map(x=>`<div class="status-row"><span>${x.label}</span><div class="track"><div class="fill" style="width:${x.count/total*100}%"></div></div><b>${x.count}</b></div>`).join("");
+}
+function renderPayments(){
+ const orders=reportData.orders;
+ const paid=orders.filter(o=>o.paymentStatus==="Paid").reduce((s,o)=>s+orderAmount(o),0);
+ const partial=orders.filter(o=>o.paymentStatus==="Partial").reduce((s,o)=>s+num(o.paidAmount),0);
+ const unpaid=orders.filter(o=>!["Paid","Partial"].includes(o.paymentStatus)).reduce((s,o)=>s+orderAmount(o),0);
+ const rows=[["Paid",paid],["Partial payments collected",partial],["Unpaid / other",unpaid]];
+ const max=Math.max(1,...rows.map(x=>x[1]));
+ $("paymentList").innerHTML=rows.map(x=>`<div class="status-row"><span>${x[0]}</span><div class="track"><div class="fill" style="width:${x[1]/max*100}%"></div></div><b>${money(x[1])}</b></div>`).join("");
+}
+function renderFollowups(){
+ const f=reportData.followups;
+ const labels=["Pending","Completed","Not Answered","Interested","Not Interested","Callback Requested"];
+ const total=Math.max(1,f.length);
+ $("followupList").innerHTML=labels.map(label=>{
+ const count=f.filter(x=>x.status===label).length;
+ return `<div class="status-row"><span>${label}</span><div class="track"><div class="fill" style="width:${count/total*100}%"></div></div><b>${count}</b></div>`;
+ }).join("");
+}
+function renderRecent(){
+ const sorted=[...reportData.orders].sort((a,b)=>orderDate(b).localeCompare(orderDate(a))).slice(0,10);
+ $("recentOrders").innerHTML=sorted.length?sorted.map(o=>`<tr>
+ <td>${safe(o.orderId||o.id)}</td><td>${safe(o.customerName||"—")}</td>
+ <td>${safe(orderDate(o)||"—")}</td><td>${money(orderAmount(o))}</td>
+ <td>${safe(o.status||"Pending")}</td><td>${safe(o.paymentStatus||"Unpaid")}</td>
+ </tr>`).join(""):'<tr><td colspan="6" class="empty">No orders found.</td></tr>';
+}
+function renderInventory(){
+ const products=reportData.products;
+ const low=products.filter(p=>num(p.stock)<=num(p.lowStockLimit));
+ const sorted=[...low].sort((a,b)=>num(a.stock)-num(b.stock)).slice(0,15);
+ $("inventoryRows").innerHTML=sorted.length?sorted.map(p=>`<tr>
+ <td>${safe(p.name||"Unnamed")}</td><td>${safe(p.sku||"—")}</td>
+ <td class="warning">${num(p.stock)}</td><td>${num(p.lowStockLimit)}</td>
+ <td>${money(num(p.purchasePrice)*num(p.stock))}</td>
+ </tr>`).join(""):'<tr><td colspan="5" class="empty">No low-stock products found.</td></tr>';
+}
+function render(){
+ const {customers,orders,products,followups}=reportData;
+ const sales=orders.reduce((s,o)=>s+orderAmount(o),0);
+ const paid=orders.filter(o=>o.paymentStatus==="Paid").reduce((s,o)=>s+orderAmount(o),0)
+ +orders.filter(o=>o.paymentStatus==="Partial").reduce((s,o)=>s+num(o.paidAmount),0);
+ const pending=orders.reduce((s,o)=>{
+  if(o.paymentStatus==="Paid")return s;
+  if(o.paymentStatus==="Partial")return s+Math.max(0,orderAmount(o)-num(o.paidAmount));
+  return s+orderAmount(o);
+ },0);
+ setText("customersCount",customers.length);
+ setText("ordersCount",orders.length);
+ setText("salesTotal",money(sales));
+ setText("paidTotal",money(paid));
+ setText("pendingTotal",money(pending));
+ setText("productsCount",products.length);
+ setText("lowStockCount",products.filter(p=>num(p.stock)<=num(p.lowStockLimit)).length);
+ setText("followupsCount",followups.filter(f=>f.status==="Completed").length);
+
+ const months=[];
+ const now=new Date();
+ for(let i=5;i>=0;i--){
+  const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+  const key=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+  const total=orders.filter(o=>orderDate(o).startsWith(key)).reduce((s,o)=>s+orderAmount(o),0);
+  months.push({key,total,label:d.toLocaleDateString("en-IN",{month:"short"})});
+ }
+ barChart(months);
+ renderStatus();renderPayments();renderFollowups();renderRecent();renderInventory();
+}
+function exportCSV(){
+ const rows=[["Order ID","Customer","Phone","Order Date","Product","Quantity","Amount","Order Status","Payment Status"]];
+ reportData.orders.forEach(o=>rows.push([
+ o.orderId||o.id,o.customerName||"",o.phone||"",orderDate(o),
+ o.productName||"",o.quantity??"",orderAmount(o),o.status||"",o.paymentStatus||""
+ ]));
+ const csv=rows.map(row=>row.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
+ const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download="vitex-orders-report.csv";a.click();
+ URL.revokeObjectURL(url);
+}
+$("exportBtn").addEventListener("click",exportCSV);
+$("logoutBtn").addEventListener("click",async e=>{e.preventDefault();await signOut(auth);location.href="index.html"});
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return}
+ try{
+  const profileSnap=await getDoc(doc(db,"users",user.uid));
+  if(!profileSnap.exists()){await signOut(auth);location.href="index.html";return}
+  const profile=profileSnap.data();
+  if(!["admin","staff"].includes(profile.role)||profile.active===false){await signOut(auth);location.href="index.html";return}
+  $("userInfo").textContent=profile.name||user.email;
+  if(profile.role!=="admin")$("settingsLink").style.display="none";
+  const names=["customers","orders","products","followups","invoices"];
+  const results=await Promise.all(names.map(name=>getDocs(collection(db,name))));
+  names.forEach((name,i)=>reportData[name]=results[i].docs.map(d=>({id:d.id,...d.data()})));
+  render();
+ }catch(err){
+  $("error").textContent="Unable to load reports: "+err.message;
+ }
+});
+</script>
+</body>
+</html>
