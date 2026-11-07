@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#145fc5">
+<title>Vitex CRM | Customers</title>
+
+<style>
+:root{
+  --blue:#145fc5;--dark:#104da2;--bg:#f4f7fc;
+  --white:#fff;--text:#1b2b45;--muted:#7b8799;
+  --border:#e7edf5;--green:#16834e;--red:#c34444;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.sidebar{
+  width:255px;background:white;border-right:1px solid var(--border);
+  position:fixed;top:0;bottom:0;left:0;z-index:20;
+  display:flex;flex-direction:column
+}
+.brand{display:flex;align-items:center;gap:11px;padding:24px 20px;border-bottom:1px solid var(--border)}
+.logo{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:var(--blue);color:white;font-size:22px;font-weight:bold}
+.brand strong{font-size:17px;color:var(--blue)}
+.brand small{display:block;font-size:10px;color:var(--muted);margin-top:4px}
+.nav-title{padding:23px 20px 10px;color:#9aa5b4;font-size:10px;font-weight:bold;letter-spacing:1px}
+.nav{padding:0 12px;overflow-y:auto}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px 13px;margin:3px 0;color:#68778e;text-decoration:none;border-radius:9px;font-size:13px}
+.nav a:hover,.nav a.active{background:#edf4ff;color:var(--blue)}
+.nav a.active{font-weight:bold}
+.nav-icon{width:21px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.user-mini{display:flex;align-items:center;gap:10px}
+.avatar{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;background:#e9f1ff;color:var(--blue);font-weight:bold}
+.user-mini strong{font-size:12px}
+.user-mini small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.main{margin-left:255px;min-height:100vh}
+.topbar{height:76px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:10}
+.top-left{display:flex;align-items:center;gap:13px}
+.topbar h2{font-size:18px;margin:0}
+.topbar p{font-size:11px;color:var(--muted);margin:5px 0 0}
+.top-actions{display:flex;align-items:center;gap:12px}
+.role-pill{background:#edf4ff;color:var(--blue);padding:8px 12px;border-radius:20px;font-size:11px;font-weight:bold}
+.logout{background:white;border:1px solid var(--border);padding:9px 13px;border-radius:8px;color:#637187;font-size:12px}
+.menu-btn{display:none;border:0;background:transparent;font-size:23px;color:var(--blue)}
+.content{padding:28px 30px}
+.page-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}
+.page-heading h1{font-size:23px;margin:0}
+.page-heading p{font-size:12px;color:var(--muted);margin:7px 0 0}
+.primary-btn{background:var(--blue);color:white;border:0;padding:12px 16px;border-radius:9px;font-size:12px;font-weight:bold}
+.primary-btn:hover{background:var(--dark)}
+.secondary-btn{background:white;color:#53647a;border:1px solid var(--border);padding:10px 14px;border-radius:8px;font-size:12px}
+.card{background:white;border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:18px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.summary-card{background:white;border:1px solid var(--border);border-radius:12px;padding:17px}
+.summary-card small{color:var(--muted);font-size:11px}
+.summary-card strong{display:block;font-size:24px;margin-top:9px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;flex-wrap:wrap}
+.search{width:100%;max-width:330px;padding:12px 13px;border:1px solid var(--border);border-radius:9px;outline:none;font-size:12px}
+.search:focus,input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #145fc51a}
+.filter{padding:11px;border:1px solid var(--border);border-radius:9px;background:white;font-size:12px;color:var(--text)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th{text-align:left;color:#98a3b2;font-size:10px;padding:13px 10px;border-bottom:1px solid var(--border)}
+td{padding:14px 10px;border-bottom:1px solid #f0f3f8;font-size:11px}
+.customer-name{font-weight:bold;color:var(--text)}
+.customer-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.type-pill{display:inline-block;padding:6px 9px;background:#edf4ff;color:var(--blue);border-radius:20px;font-size:10px}
+.action-btn{border:1px solid var(--border);background:white;border-radius:7px;padding:7px 9px;font-size:11px;color:#52637a;margin-right:4px}
+.action-btn:hover{background:#edf4ff;color:var(--blue)}
+.delete-btn{color:var(--red)}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:12px}
+.message{display:none;padding:12px;margin-bottom:15px;border-radius:8px;font-size:12px;line-height:1.5}
+.message.error{display:block;background:#fff0f0;color:#a82929}
+.message.success{display:block;background:#edfff4;color:#176c40}
+.loading{text-align:center;padding:25px;color:var(--muted);font-size:12px}
+.modal-backdrop{display:none;position:fixed;inset:0;background:#10233e88;z-index:50;padding:20px;overflow-y:auto}
+.modal-backdrop.show{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:white;width:100%;max-width:720px;margin:auto;border-radius:15px;padding:25px;box-shadow:0 20px 60px #0002}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-head h2{font-size:19px;margin:0}
+.close-btn{border:0;background:#f0f3f8;border-radius:8px;width:33px;height:33px;font-size:19px;color:#52637a}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field label{display:block;font-size:11px;font-weight:bold;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;outline:none;font-size:12px;background:white}
+.field textarea{min-height:70px;resize:vertical}
+.full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+#formMessage{margin-top:12px}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.menu-btn{display:block}.topbar{padding:0 15px}.content{padding:20px 14px}}
+@media(max-width:600px){.summary{grid-template-columns:1fr 1fr}.page-heading{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.modal{padding:18px}.role-pill{display:none}}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="logo">V</div>
+    <div><strong>VITEX CRM</strong><small>BUSINESS MANAGEMENT</small></div>
+  </div>
+
+  <div class="nav-title">WORKSPACE</div>
+  <nav class="nav">
+    <a href="dashboard.html"><span class="nav-icon">▦</span>Dashboard</a>
+    <a href="orders.html"><span class="nav-icon">▤</span>Orders</a>
+    <a href="customers.html" class="active"><span class="nav-icon">♙</span>Customers</a>
+    <a href="products.html"><span class="nav-icon">▣</span>Products & Inventory</a>
+    <a href="shipping.html"><span class="nav-icon">🚚</span>Shipping & Tracking</a>
+    <a href="invoices.html"><span class="nav-icon">▧</span>Billing & Invoices</a>
+
+    <div class="nav-title">MANAGEMENT</div>
+    <a href="followups.html"><span class="nav-icon">☎</span>Calls & Follow-ups</a>
+    <a href="reports.html"><span class="nav-icon">▥</span>Reports</a>
+    <a href="settings.html" id="settingsLink"><span class="nav-icon">⚙</span>Settings</a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="user-mini">
+      <div class="avatar" id="avatar">V</div>
+      <div><strong id="sideUser">Loading...</strong><small id="sideRole">Verifying...</small></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="top-left">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div><h2>Customers</h2><p>Manage your customer database</p></div>
+    </div>
+    <div class="top-actions">
+      <span class="role-pill" id="rolePill">VERIFYING</span>
+      <button class="logout" id="logoutBtn">Logout ↗</button>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="page-heading">
+      <div>
+        <h1>Customer Management</h1>
+        <p>Add, search, update and manage customer records.</p>
+      </div>
+      <button class="primary-btn" id="addCustomerBtn">＋ Add Customer</button>
+    </div>
+
+    <div id="pageMessage" class="message"></div>
+
+    <div class="summary">
+      <div class="summary-card"><small>Total Customers</small><strong id="totalCustomers">—</strong></div>
+      <div class="summary-card"><small>Individual Customers</small><strong id="individualCount">—</strong></div>
+      <div class="summary-card"><small>Business Customers</small><strong id="businessCount">—</strong></div>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+        <input id="searchInput" class="search" type="search" placeholder="Search name, phone, email or city...">
+        <select id="typeFilter" class="filter">
+          <option value="">All customer types</option>
+          <option value="Individual">Individual</option>
+          <option value="Business">Business</option>
+          <option value="Wholesale">Wholesale</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>CUSTOMER</th>
+              <th>PHONE</th>
+              <th>CUSTOMER TYPE</th>
+              <th>CITY / PIN</th>
+              <th>GSTIN</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="customerTable">
+            <tr><td colspan="6" class="loading">Loading customers...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Add / Edit Customer Modal -->
+<div class="modal-backdrop" id="customerModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Add New Customer</h2>
+      <button class="close-btn" id="closeModal" type="button">×</button>
+    </div>
+
+    <form id="customerForm">
+      <input type="hidden" id="customerId">
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="customerName">Customer Name *</label>
+          <input id="customerName" maxlength="100" required placeholder="Enter full name">
+        </div>
+
+        <div class="field">
+          <label for="customerPhone">Mobile Number *</label>
+          <input id="customerPhone" type="tel" maxlength="15" required placeholder="10-digit mobile number">
+        </div>
+
+        <div class="field">
+          <label for="customerEmail">Email Address</label>
+          <input id="customerEmail" type="email" maxlength="120" placeholder="Email address">
+        </div>
+
+        <div class="field">
+          <label for="customerType">Customer Type *</label>
+          <select id="customerType" required>
+            <option value="Individual">Individual</option>
+            <option value="Business">Business</option>
+            <option value="Wholesale">Wholesale</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="companyName">Company / Business Name</label>
+          <input id="companyName" maxlength="120" placeholder="Business name (if applicable)">
+        </div>
+
+        <div class="field">
+          <label for="gstin">GSTIN</label>
+          <input id="gstin" maxlength="15" placeholder="15-character GSTIN">
+        </div>
+
+        <div class="field full">
+          <label for="address">Full Address *</label>
+          <textarea id="address" maxlength="500" required placeholder="House, street, area, landmark"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="city">City *</label>
+          <input id="city" maxlength="70" required placeholder="City">
+        </div>
+
+        <div class="field">
+          <label for="state">State *</label>
+          <select id="state" required>
+            <option value="">Select state</option>
+            <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+            <option>Assam</option><option>Bihar</option><option>Chhattisgarh</option>
+            <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+            <option>Himachal Pradesh</option><option>Jharkhand</option>
+            <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
+            <option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option>
+            <option>Mizoram</option><option>Nagaland</option><option>Odisha</option>
+            <option>Punjab</option><option>Rajasthan</option><option>Sikkim</option>
+            <option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option>
+            <option>Uttar Pradesh</option><option>Uttarakhand</option>
+            <option>West Bengal</option><option>Delhi</option>
+            <option>Jammu and Kashmir</option><option>Ladakh</option>
+            <option>Chandigarh</option><option>Puducherry</option>
+            <option>Andaman and Nicobar Islands</option>
+            <option>Dadra and Nagar Haveli and Daman and Diu</option>
+            <option>Lakshadweep</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="pincode">PIN Code *</label>
+          <input id="pincode" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" required placeholder="6-digit PIN">
+        </div>
+
+        <div class="field">
+          <label for="notes">Customer Notes</label>
+          <input id="notes" maxlength="500" placeholder="Additional information">
+        </div>
+      </div>
+
+      <div id="formMessage" class="message"></div>
+
+      <div class="form-actions">
+        <button type="button" class="secondary-btn" id="cancelBtn">Cancel</button>
+        <button type="submit" class="primary-btn" id="saveBtn">Save Customer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+  authDomain: "smile-business-os.firebaseapp.com",
+  projectId: "smile-business-os",
+  storageBucket: "smile-business-os.firebasestorage.app",
+  messagingSenderId: "114356400630",
+  appId: "1:114356400630:web:96fc9d07baaf3a504c17d7",
+  measurementId: "G-73WD9V05ZZ"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const customersRef = db.collection("customers");
+
+let currentUser = null;
+let currentRole = null;
+let customers = [];
+let saving = false;
+
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#039;"
+  })[char]);
+}
+
+function showPageMessage(text, type = "error") {
+  $("pageMessage").textContent = text;
+  $("pageMessage").className = "message " + type;
+}
+
+function showFormMessage(text, type = "error") {
+  $("formMessage").textContent = text;
+  $("formMessage").className = "message " + type;
+}
+
+function clearFormMessage() {
+  $("formMessage").textContent = "";
+  $("formMessage").className = "message";
+}
+
+// Sidebar on mobile
+$("menuBtn").addEventListener("click", () => {
+  $("sidebar").classList.toggle("open");
+});
+
+document.addEventListener("click", event => {
+  if (window.innerWidth <= 900 &&
+      !$("sidebar").contains(event.target) &&
+      !$("menuBtn").contains(event.target)) {
+    $("sidebar").classList.remove("open");
+  }
+});
+
+// Logout
+$("logoutBtn").addEventListener("click", async () => {
+  if (!confirm("Are you sure you want to logout?")) return;
+  await auth.signOut();
+  window.location.replace("index.html");
+});
+
+// Modal controls
+function openModal(customer = null) {
+  $("customerForm").reset();
+  $("customerId").value = "";
+  clearFormMessage();
+
+  if (customer) {
+    $("modalTitle").textContent = "Edit Customer";
+    $("saveBtn").textContent = "Update Customer";
+    $("customerId").value = customer.id;
+
+    $("customerName").value = customer.name || "";
+    $("customerPhone").value = customer.phone || "";
+    $("customerEmail").value = customer.email || "";
+    $("customerType").value = customer.type || "Individual";
+    $("companyName").value = customer.companyName || "";
+    $("gstin").value = customer.gstin || "";
+    $("address").value = customer.address || "";
+    $("city").value = customer.city || "";
+    $("state").value = customer.state || "";
+    $("pincode").value = customer.pincode || "";
+    $("notes").value = customer.notes || "";
+  } else {
+    $("modalTitle").textContent = "Add New Customer";
+    $("saveBtn").textContent = "Save Customer";
+  }
+
+  $("customerModal").classList.add("show");
+}
+
+function closeModal() {
+  $("customerModal").classList.remove("show");
+  $("customerForm").reset();
+  clearFormMessage();
+}
+
+$("addCustomerBtn").addEventListener("click", () => openModal());
+$("closeModal").addEventListener("click", closeModal);
+$("cancelBtn").addEventListener("click", closeModal);
+
+$("customerModal").addEventListener("click", event => {
+  if (event.target === $("customerModal")) closeModal();
+});
+
+// Verify Firebase account and role
+async function verifyAccess(user) {
+  const doc = await db.collection("users").doc(user.uid).get();
+
+  if (!doc.exists) throw new Error("CRM user profile not found.");
+
+  const data = doc.data();
+  const role = String(data.role || "").toLowerCase();
+
+  if (!["admin", "staff"].includes(role)) {
+    throw new Error("Your account does not have permission.");
+  }
+
+  if (data.active === false) {
+    throw new Error("Your account has been disabled.");
+  }
+
+  currentUser = user;
+  currentRole = role;
+
+  const name = data.name || user.email.split("@")[0];
+  $("sideUser").textContent = name;
+  $("sideRole").textContent = role.toUpperCase();
+  $("rolePill").textContent = role.toUpperCase();
+  $("avatar").textContent = name.charAt(0).toUpperCase();
+
+  if (role !== "admin") {
+    $("settingsLink").style.display = "none";
+  }
+
+  await loadCustomers();
+}
+
+// Save or update customer
+$("customerForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (saving) return;
+
+  const name = $("customerName").value.trim();
+  const phone = $("customerPhone").value.trim();
+  const email = $("customerEmail").value.trim();
+  const type = $("customerType").value;
+  const gstin = $("gstin").value.trim().toUpperCase();
+  const pincode = $("pincode").value.trim();
+
+  const phoneDigits = phone.replace(/\D/g, "");
+
+  if (phoneDigits.length < 10 || phoneDigits.length > 13) {
+    showFormMessage("Please enter a valid mobile number.");
+    return;
+  }
+
+  if (!/^[0-9]{6}$/.test(pincode)) {
+    showFormMessage("PIN code must contain exactly 6 digits.");
+    return;
+  }
+
+  if (gstin && !/^[0-9A-Z]{15}$/.test(gstin)) {
+    showFormMessage("Please enter a valid 15-character GSTIN format.");
+    return;
+  }
+
+  const customerId = $("customerId").value;
+
+  const customerData = {
+    name,
+    phone,
+    email,
+    type,
+    companyName: $("companyName").value.trim(),
+    gstin,
+    address: $("address").value.trim(),
+    city: $("city").value.trim(),
+    state: $("state").value,
+    pincode,
+    notes: $("notes").value.trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy: currentUser.uid
+  };
+
+  saving = true;
+  $("saveBtn").disabled = true;
+  $("saveBtn").textContent = "Saving...";
+
+  try {
+    if (customerId) {
+      await customersRef.doc(customerId).update(customerData);
+      showPageMessage("Customer updated successfully.", "success");
+    } else {
+      customerData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      customerData.createdBy = currentUser.uid;
+      await customersRef.add(customerData);
+      showPageMessage("New customer saved successfully.", "success");
+    }
+
+    closeModal();
+    await loadCustomers();
+
+  } catch (error) {
+    console.error("Customer save error:", error);
+    showFormMessage("Could not save customer. Please check Firestore permissions and try again.");
+  } finally {
+    saving = false;
+    $("saveBtn").disabled = false;
+    $("saveBtn").textContent = customerId ? "Update Customer" : "Save Customer";
+  }
+});
+
+// Load customer records
+async function loadCustomers() {
+  $("customerTable").innerHTML =
+    '<tr><td colspan="6" class="loading">Loading customer records...</td></tr>';
+
+  try {
+    const snapshot = await customersRef.get();
+
+    customers = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    customers.sort((a, b) =>
+      String(a.name || "").localeCompare(String(b.name || ""))
+    );
+
+    renderCustomers();
+
+  } catch (error) {
+    console.error("Customer loading error:", error);
+    $("customerTable").innerHTML =
+      '<tr><td colspan="6" class="empty">Unable to load customers. Check Firestore access rules.</td></tr>';
+    showPageMessage("Customer records could not be loaded.", "error");
+  }
+}
+
+// Render table and summary
+function renderCustomers() {
+  const search = $("searchInput").value.toLowerCase().trim();
+  const filter = $("typeFilter").value;
+
+  const individual = customers.filter(c => c.type === "Individual").length;
+  const business = customers.filter(c => c.type === "Business" || c.type === "Wholesale").length;
+
+  $("totalCustomers").textContent = customers.length;
+  $("individualCount").textContent = individual;
+  $("businessCount").textContent = business;
+
+  const filtered = customers.filter(c => {
+    const searchable = [
+      c.name, c.phone, c.email, c.city,
+      c.companyName, c.gstin, c.pincode
+    ].join(" ").toLowerCase();
+
+    return searchable.includes(search) && (!filter || c.type === filter);
+  });
+
+  if (!filtered.length) {
+    $("customerTable").innerHTML =
+      '<tr><td colspan="6" class="empty">No matching customers found.</td></tr>';
+    return;
+  }
+
+  $("customerTable").innerHTML = filtered.map(c => `
+    <tr>
+      <td>
+        <div class="customer-name">${escapeHTML(c.name || "Unnamed")}</div>
+        <div class="customer-sub">${escapeHTML(c.email || "No email")}</div>
+      </td>
+      <td>${escapeHTML(c.phone || "—")}</td>
+      <td><span class="type-pill">${escapeHTML(c.type || "Individual")}</span></td>
+      <td>${escapeHTML(c.city || "—")} / ${escapeHTML(c.pincode || "—")}</td>
+      <td>${escapeHTML(c.gstin || "—")}</td>
+      <td>
+        <button class="action-btn" data-action="edit" data-id="${escapeHTML(c.id)}">Edit</button>
+        ${currentRole === "admin" ?
+          `<button class="action-btn delete-btn" data-action="delete" data-id="${escapeHTML(c.id)}">Delete</button>` : ""}
+      </td>
+    </tr>
+  `).join("");
+}
+
+// Search and filter
+$("searchInput").addEventListener("input", renderCustomers);
+$("typeFilter").addEventListener("change", renderCustomers);
+
+// Edit and delete actions
+$("customerTable").addEventListener("click", async event => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const id = button.dataset.id;
+  const customer = customers.find(c => c.id === id);
+  if (!customer) return;
+
+  if (button.dataset.action === "edit") {
+    openModal(customer);
+  }
+
+  if (button.dataset.action === "delete") {
+    if (currentRole !== "admin") {
+      showPageMessage("Only Admin can delete customers.");
+      return;
+    }
+
+    if (!confirm("Delete this customer permanently? This action cannot be undone.")) return;
+
+    try {
+      await customersRef.doc(id).delete();
+      showPageMessage("Customer deleted successfully.", "success");
+      await loadCustomers();
+    } catch (error) {
+      console.error(error);
+      showPageMessage("Unable to delete customer. Check Firestore permissions.");
+    }
+  }
+});
+
+// Authentication listener
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  try {
+    await verifyAccess(user);
+  } catch (error) {
+    console.error(error);
+    alert(error.message || "Access denied.");
+    await auth.signOut();
+    window.location.replace("index.html");
+  }
+});
+</script>
+</body>
+</html>
