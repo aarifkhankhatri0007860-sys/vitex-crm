@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shipping Management | Vitex CRM</title>
+<style>
+:root{--blue:#1769d2;--dark:#16345c;--bg:#f4f7fc;--border:#e5eaf2;--text:#26364b;--muted:#718096;--green:#159765;--red:#dc4c4c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:8px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:5px}
+.nav a{display:block;text-decoration:none;color:#526176;padding:12px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:26px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:25px;margin:0 0 6px;color:var(--dark)}
+.sub{font-size:13px;color:var(--muted)}
+.btn{border:0;border-radius:8px;padding:11px 16px;background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+.btn.secondary{background:#eaf2ff;color:var(--blue)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:19px}
+.card .label{font-size:12px;color:var(--muted)}
+.card .number{font-size:25px;font-weight:800;margin-top:9px;color:var(--dark)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:17px}
+.toolbar input,.toolbar select{padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff;min-width:180px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:950px}
+th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--border);font-size:13px}
+th{font-size:11px;color:var(--muted);text-transform:uppercase;background:#fafbfd}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#edf2f7;color:#526176}
+.status.Delivered{background:#e6f7ef;color:#128456}
+.status.RTO,.status.Returned{background:#fff0f0;color:#cf4141}
+.status.Shipped,.status.InTransit{background:#e9f2ff;color:#1769d2}
+.status.PickedUp,.status.OutForDelivery{background:#fff5df;color:#a56b00}
+.actions{display:flex;gap:6px}
+.actions button{border:0;padding:7px 9px;border-radius:6px;cursor:pointer;background:#edf3fc;color:var(--blue)}
+.modal{display:none;position:fixed;inset:0;background:#14243c88;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:15px;width:100%;max-width:700px;max-height:92vh;overflow:auto;padding:23px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:20px}
+.close{border:0;background:#f0f3f8;border-radius:8px;padding:8px 12px;cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.field textarea{resize:vertical;min-height:65px}
+.full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+#notice{position:fixed;right:20px;bottom:20px;background:#183b68;color:#fff;padding:13px 18px;border-radius:9px;display:none;z-index:20;max-width:90vw}
+@media(max-width:950px){.sidebar{width:205px}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:5px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.cards{gap:9px}.card{padding:13px}.card .number{font-size:21px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">VITEX <small>AYURVEDA CRM</small></div>
+  <nav class="nav">
+    <a href="dashboard.html">▦ Dashboard</a>
+    <a href="customers.html">♙ Customers</a>
+    <a href="orders.html">▤ Orders</a>
+    <a href="products.html">▣ Products</a>
+    <a href="shipping.html" class="active">➜ Shipping</a>
+    <a href="invoices.html">▧ Invoices</a>
+    <a href="followups.html">☎ Follow-ups</a>
+    <a href="reports.html">▥ Reports</a>
+    <a href="settings.html" id="settingsLink">⚙ Settings</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <div>
+      <h1>Shipping & Delivery</h1>
+      <div class="sub">Manage courier, tracking and delivery status</div>
+    </div>
+    <button class="btn" onclick="openModal()">+ Create Shipment</button>
+  </div>
+
+  <section class="cards">
+    <div class="card"><div class="label">Total Shipments</div><div class="number" id="totalShipments">0</div></div>
+    <div class="card"><div class="label">Ready / Pending</div><div class="number" id="pendingShipments">0</div></div>
+    <div class="card"><div class="label">In Transit</div><div class="number" id="transitShipments">0</div></div>
+    <div class="card"><div class="label">Delivered</div><div class="number" id="deliveredShipments">0</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <input id="search" placeholder="Search order / AWB / customer..." oninput="renderShipments()">
+      <select id="statusFilter" onchange="renderShipments()">
+        <option value="">All Status</option>
+        <option>Ready to Ship</option>
+        <option>Picked Up</option>
+        <option>In Transit</option>
+        <option>Out for Delivery</option>
+        <option>Delivered</option>
+        <option>RTO</option>
+        <option>Returned</option>
+      </select>
+      <button class="btn secondary" onclick="loadShipments()">↻ Refresh</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Order ID</th><th>Customer</th><th>Courier</th><th>AWB / Tracking</th>
+          <th>Payment</th><th>COD Amount</th><th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="shippingBody"><tr><td colspan="8" class="empty">Loading shipments...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="countText" class="sub" style="margin-top:15px"></div>
+  </section>
+</main>
+</div>
+
+<div class="modal" id="shippingModal">
+<div class="modal-box">
+  <div class="modal-head">
+    <h2 id="modalTitle">Create Shipment</h2>
+    <button class="close" onclick="closeModal()">✕</button>
+  </div>
+  <form id="shippingForm">
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="field full">
+        <label>Select Order *</label>
+        <select id="orderSelect" required><option value="">Select order</option></select>
+      </div>
+      <div class="field">
+        <label>Courier Partner *</label>
+        <select id="courier" required>
+          <option value="">Select courier</option>
+          <option>Delhivery</option><option>Blue Dart</option>
+          <option>DTDC</option><option>India Post</option>
+          <option>Ekart</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>AWB / Tracking Number</label>
+        <input id="awb" placeholder="Enter tracking number">
+      </div>
+      <div class="field">
+        <label>Shipment Status *</label>
+        <select id="shippingStatus" required>
+          <option>Ready to Ship</option><option>Picked Up</option>
+          <option>In Transit</option><option>Out for Delivery</option>
+          <option>Delivered</option><option>RTO</option><option>Returned</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Payment Mode</label>
+        <select id="paymentMode"><option>COD</option><option>Prepaid</option></select>
+      </div>
+      <div class="field">
+        <label>COD Amount (₹)</label>
+        <input type="number" id="codAmount" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Shipping Charges (₹)</label>
+        <input type="number" id="shippingCharge" min="0" step="0.01" value="0">
+      </div>
+      <div class="field">
+        <label>Dispatch Date</label>
+        <input type="date" id="dispatchDate">
+      </div>
+      <div class="field full">
+        <label>Tracking URL</label>
+        <input type="url" id="trackingUrl" placeholder="https://courier-tracking-link...">
+      </div>
+      <div class="field full">
+        <label>Shipping Notes</label>
+        <textarea id="shippingNotes" placeholder="Delivery instructions or remarks..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn" id="saveBtn">Save Shipment</button>
+    </div>
+  </form>
+</div>
+</div>
+<div id="notice"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+ getFirestore,collection,doc,getDoc,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let role="",orders=[],shipments=[];
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function safe(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function notify(message){
+ $("notice").textContent=message;
+ $("notice").style.display="block";
+ setTimeout(()=>$("notice").style.display="none",3000);
+}
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return;}
+ try{
+  const snap=await getDoc(doc(db,"users",user.uid));
+  if(!snap.exists())throw new Error("User role not configured.");
+  const data=snap.data();
+  role=data.role;
+  if(!["admin","staff"].includes(role)||data.active===false)throw new Error("Account inactive or unauthorized.");
+  if(role==="staff")$("settingsLink").style.display="none";
+  await loadOrders();
+  await loadShipments();
+ }catch(e){console.error(e);notify(e.message||"Unable to load shipping data.");}
+});
+
+async function loadOrders(){
+ const snap=await getDocs(collection(db,"orders"));
+ orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+ const shipmentOrderIds=new Set(shipments.map(s=>s.orderId));
+ const available=orders.filter(o=>!shipmentOrderIds.has(o.id));
+ $("orderSelect").innerHTML='<option value="">Select order</option>'+available.map(o=>
+ `<option value="${safe(o.id)}">${safe(o.orderId||o.id.slice(0,8))} — ${safe(o.customerName||"Customer")} — ${money(o.totalAmount)}</option>`
+ ).join("");
+}
+
+async function loadShipments(){
+ const snap=await getDocs(collection(db,"shipments"));
+ shipments=snap.docs.map(d=>({id:d.id,...d.data()}));
+ renderShipments();
+ await loadOrders();
+}
+window.loadShipments=async()=>{
+ try{await loadShipments();notify("Shipping records refreshed.");}
+ catch(e){notify(e.message||"Refresh failed.");}
+};
+window.renderShipments=renderShipments;
+
+function renderShipments(){
+ const search=$("search").value.toLowerCase();
+ const status=$("statusFilter").value;
+ const filtered=shipments.filter(s=>{
+  const text=[s.orderNumber,s.customerName,s.awb,s.courier].join(" ").toLowerCase();
+  return text.includes(search)&&(!status||s.status===status);
+ });
+ $("totalShipments").textContent=shipments.length;
+ $("pendingShipments").textContent=shipments.filter(s=>["Ready to Ship","Picked Up"].includes(s.status)).length;
+ $("transitShipments").textContent=shipments.filter(s=>["In Transit","Out for Delivery"].includes(s.status)).length;
+ $("deliveredShipments").textContent=shipments.filter(s=>s.status==="Delivered").length;
+ $("countText").textContent=`Showing ${filtered.length} of ${shipments.length} shipments`;
+ if(!filtered.length){
+  $("shippingBody").innerHTML='<tr><td colspan="8" class="empty">No shipments found.</td></tr>';
+  return;
+ }
+ $("shippingBody").innerHTML=filtered.map(s=>`
+ <tr>
+ <td><b>${safe(s.orderNumber||"—")}</b></td>
+ <td>${safe(s.customerName||"—")}</td>
+ <td>${safe(s.courier||"—")}</td>
+ <td>${safe(s.awb||"—")}${s.trackingUrl?`<br><a href="${safe(s.trackingUrl)}" target="_blank" rel="noopener">Track shipment</a>`:""}</td>
+ <td>${safe(s.paymentMode||"—")}</td>
+ <td>${money(s.codAmount)}</td>
+ <td><span class="status">${safe(s.status||"Ready to Ship")}</span></td>
+ <td><div class="actions"><button onclick="editShipment('${safe(s.id)}')">Edit</button></div></td>
+ </tr>`).join("");
+}
+
+window.openModal=(id=null)=>{
+ $("shippingForm").reset();
+ $("editId").value=id||"";
+ $("codAmount").value=0;
+ $("shippingCharge").value=0;
+ $("dispatchDate").value=new Date().toISOString().slice(0,10);
+ $("modalTitle").textContent=id?"Edit Shipment":"Create Shipment";
+ $("saveBtn").textContent=id?"Update Shipment":"Save Shipment";
+ $("orderSelect").disabled=!!id;
+
+ if(id){
+  const s=shipments.find(x=>x.id===id);if(!s)return;
+  $("orderSelect").innerHTML=`<option value="${safe(s.orderId)}">${safe(s.orderNumber||"Order")}</option>`+
+   $("orderSelect").innerHTML;
+  $("orderSelect").value=s.orderId;
+  $("courier").value=s.courier||"";
+  $("awb").value=s.awb||"";
+  $("shippingStatus").value=s.status||"Ready to Ship";
+  $("paymentMode").value=s.paymentMode||"COD";
+  $("codAmount").value=s.codAmount||0;
+  $("shippingCharge").value=s.shippingCharge||0;
+  $("dispatchDate").value=s.dispatchDate||"";
+  $("trackingUrl").value=s.trackingUrl||"";
+  $("shippingNotes").value=s.notes||"";
+ }
+ $("shippingModal").classList.add("show");
+};
+window.closeModal=()=>{
+ $("shippingModal").classList.remove("show");
+ $("orderSelect").disabled=false;
+};
+window.editShipment=id=>openModal(id);
+
+$("orderSelect").addEventListener("change",()=>{
+ const o=orders.find(x=>x.id===$("orderSelect").value);
+ if(!o)return;
+ $("paymentMode").value=o.paymentMode||"COD";
+ $("codAmount").value=o.paymentMode==="COD"?(o.totalAmount||0):0;
+});
+
+$("shippingForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const editId=$("editId").value;
+ const order=orders.find(o=>o.id===$("orderSelect").value);
+ const existing=editId?shipments.find(s=>s.id===editId):null;
+ const selectedOrder=order||orders.find(o=>o.id===existing?.orderId);
+ if(!selectedOrder){notify("Please select an order.");return;}
+
+ const courier=$("courier").value;
+ if(!courier){notify("Please select courier partner.");return;}
+
+ const trackingUrl=$("trackingUrl").value.trim();
+ if(trackingUrl){
+  try{const url=new URL(trackingUrl);if(!["http:","https:"].includes(url.protocol))throw new Error();}
+  catch{notify("Enter a valid tracking URL.");return;}
+ }
+
+ const paymentMode=$("paymentMode").value;
+ const codAmount=Number($("codAmount").value)||0;
+ const shippingCharge=Number($("shippingCharge").value)||0;
+ if(codAmount<0||shippingCharge<0){notify("Amounts cannot be negative.");return;}
+
+ const data={
+  orderId:selectedOrder.id,
+  orderNumber:selectedOrder.orderId||selectedOrder.id.slice(0,8),
+  customerName:selectedOrder.customerName||"",
+  phone:selectedOrder.phone||"",
+  courier,awb:$("awb").value.trim(),
+  status:$("shippingStatus").value,
+  paymentMode,
+  codAmount:paymentMode==="COD"?codAmount:0,
+  shippingCharge,
+  dispatchDate:$("dispatchDate").value,
+  trackingUrl,
+  notes:$("shippingNotes").value.trim(),
+  updatedAt:serverTimestamp()
+ };
+
+ try{
+  $("saveBtn").disabled=true;
+  if(editId){
+   await updateDoc(doc(db,"shipments",editId),data);
+   notify("Shipment updated.");
+  }else{
+   await addDoc(collection(db,"shipments"),{
+    ...data,createdAt:serverTimestamp()
+   });
+   notify("Shipment created.");
+  }
+  closeModal();
+  await loadShipments();
+ }catch(error){
+  console.error(error);
+  notify(error.message||"Unable to save shipment.");
+ }finally{$("saveBtn").disabled=false;}
+});
+
+$("shippingModal").addEventListener("click",e=>{
+ if(e.target===$("shippingModal"))closeModal();
+});
+</script>
+</body>
+</html>
