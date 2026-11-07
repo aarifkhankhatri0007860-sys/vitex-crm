@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products & Inventory | Vitex CRM</title>
+<style>
+:root{--blue:#1769d2;--dark:#16345c;--bg:#f4f7fc;--border:#e5eaf2;--text:#26364b;--muted:#718096;--green:#159765;--red:#dc4c4c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:8px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:5px}
+.nav a{display:block;text-decoration:none;color:#526176;padding:12px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:26px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:25px;margin:0 0 6px;color:var(--dark)}
+.sub{font-size:13px;color:var(--muted)}
+.btn{border:0;border-radius:8px;padding:11px 16px;background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+.btn.secondary{background:#eaf2ff;color:var(--blue)}
+.btn.danger{background:#fff0f0;color:var(--red)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:19px}
+.card .label{font-size:12px;color:var(--muted)}
+.card .number{font-size:25px;font-weight:800;margin-top:9px;color:var(--dark)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:17px}
+.toolbar input,.toolbar select{padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff;min-width:180px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--border);font-size:13px}
+th{font-size:11px;color:var(--muted);text-transform:uppercase;background:#fafbfd}
+.stock{font-weight:700}
+.low{color:#d97706}
+.out{color:var(--red)}
+.good{color:var(--green)}
+.actions{display:flex;gap:6px}
+.actions button{border:0;padding:7px 9px;border-radius:6px;cursor:pointer;background:#edf3fc;color:var(--blue)}
+.actions .del{background:#fff0f0;color:var(--red)}
+.modal{display:none;position:fixed;inset:0;background:#14243c88;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:15px;width:100%;max-width:650px;max-height:92vh;overflow:auto;padding:23px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:20px}
+.close{border:0;background:#f0f3f8;border-radius:8px;padding:8px 12px;cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.field textarea{resize:vertical;min-height:70px}
+.full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+#notice{position:fixed;right:20px;bottom:20px;background:#183b68;color:#fff;padding:13px 18px;border-radius:9px;display:none;z-index:20;max-width:90vw}
+@media(max-width:950px){.sidebar{width:205px}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:5px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.cards{gap:9px}.card{padding:13px}.card .number{font-size:21px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">VITEX <small>AYURVEDA CRM</small></div>
+  <nav class="nav">
+    <a href="dashboard.html">▦ Dashboard</a>
+    <a href="customers.html">♙ Customers</a>
+    <a href="orders.html">▤ Orders</a>
+    <a href="products.html" class="active">▣ Products</a>
+    <a href="shipping.html">➜ Shipping</a>
+    <a href="invoices.html">▧ Invoices</a>
+    <a href="followups.html">☎ Follow-ups</a>
+    <a href="reports.html">▥ Reports</a>
+    <a href="settings.html" id="settingsLink">⚙ Settings</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="top">
+    <div>
+      <h1>Products & Inventory</h1>
+      <div class="sub">Manage products, pricing and stock levels</div>
+    </div>
+    <button class="btn" onclick="openModal()">+ Add Product</button>
+  </div>
+
+  <section class="cards">
+    <div class="card"><div class="label">Total Products</div><div class="number" id="totalProducts">0</div></div>
+    <div class="card"><div class="label">Total Stock Units</div><div class="number" id="totalStock">0</div></div>
+    <div class="card"><div class="label">Low Stock Products</div><div class="number" id="lowStock">0</div></div>
+    <div class="card"><div class="label">Inventory Value</div><div class="number" id="inventoryValue">₹0</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar">
+      <input id="search" placeholder="Search name / SKU..." oninput="renderProducts()">
+      <select id="categoryFilter" onchange="renderProducts()">
+        <option value="">All Categories</option>
+        <option>Ayurvedic</option>
+        <option>Herbal</option>
+        <option>Personal Care</option>
+        <option>Wellness</option>
+        <option>Other</option>
+      </select>
+      <select id="stockFilter" onchange="renderProducts()">
+        <option value="">All Stock</option>
+        <option value="low">Low Stock</option>
+        <option value="out">Out of Stock</option>
+        <option value="available">Available</option>
+      </select>
+      <button class="btn secondary" onclick="loadProducts()">↻ Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Product</th><th>SKU</th><th>Category</th>
+          <th>Purchase Price</th><th>Selling Price</th>
+          <th>Stock</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="productsBody"><tr><td colspan="7" class="empty">Loading products...</td></tr></tbody>
+      </table>
+    </div>
+    <div id="countText" class="sub" style="margin-top:15px"></div>
+  </section>
+</main>
+</div>
+
+<div class="modal" id="productModal">
+<div class="modal-box">
+  <div class="modal-head">
+    <h2 id="modalTitle">Add New Product</h2>
+    <button class="close" onclick="closeModal()">✕</button>
+  </div>
+  <form id="productForm">
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="field">
+        <label>Product Name *</label>
+        <input id="name" required maxlength="100" placeholder="Enter product name">
+      </div>
+      <div class="field">
+        <label>SKU / Product Code</label>
+        <input id="sku" maxlength="40" placeholder="e.g. VTX-001">
+      </div>
+      <div class="field">
+        <label>Category *</label>
+        <select id="category" required>
+          <option value="">Select category</option>
+          <option>Ayurvedic</option><option>Herbal</option>
+          <option>Personal Care</option><option>Wellness</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Unit / Pack Size</label>
+        <input id="unit" placeholder="e.g. 100g, 60 tablets, 1 bottle">
+      </div>
+      <div class="field">
+        <label>Purchase Price (₹) *</label>
+        <input type="number" id="purchasePrice" min="0" step="0.01" required>
+      </div>
+      <div class="field">
+        <label>Selling Price (₹) *</label>
+        <input type="number" id="price" min="0" step="0.01" required>
+      </div>
+      <div class="field">
+        <label>Available Stock *</label>
+        <input type="number" id="stock" min="0" step="1" required>
+      </div>
+      <div class="field">
+        <label>Low Stock Alert At</label>
+        <input type="number" id="lowStockLimit" min="0" value="5">
+      </div>
+      <div class="field full">
+        <label>Product Description</label>
+        <textarea id="description" placeholder="Enter product details..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button type="submit" class="btn" id="saveBtn">Save Product</button>
+    </div>
+  </form>
+</div>
+</div>
+<div id="notice"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+ getFirestore,collection,doc,getDoc,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+let role="";
+let products=[];
+
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+function safe(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function notify(message){
+ $("notice").textContent=message;
+ $("notice").style.display="block";
+ setTimeout(()=>$("notice").style.display="none",3000);
+}
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return;}
+ try{
+  const snap=await getDoc(doc(db,"users",user.uid));
+  if(!snap.exists())throw new Error("User role not configured.");
+  const data=snap.data();
+  role=data.role;
+  if(!["admin","staff"].includes(role)||data.active===false)throw new Error("Account inactive or unauthorized.");
+  if(role==="staff")$("settingsLink").style.display="none";
+  await loadProducts();
+ }catch(e){console.error(e);notify(e.message||"Unable to load products.");}
+});
+
+async function loadProducts(){
+ const snap=await getDocs(collection(db,"products"));
+ products=snap.docs.map(d=>({id:d.id,...d.data()}));
+ products.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+ renderProducts();
+}
+window.loadProducts=async()=>{
+ try{await loadProducts();notify("Products refreshed.");}
+ catch(e){notify(e.message||"Could not load products.");}
+};
+window.renderProducts=renderProducts;
+
+function renderProducts(){
+ const search=$("search").value.toLowerCase();
+ const category=$("categoryFilter").value;
+ const stockFilter=$("stockFilter").value;
+
+ const filtered=products.filter(p=>{
+  const stock=Number(p.stock||0);
+  const limit=Number(p.lowStockLimit??5);
+  const matchSearch=[p.name,p.sku].some(v=>String(v||"").toLowerCase().includes(search));
+  const matchCategory=!category||p.category===category;
+  const matchStock=!stockFilter||
+   (stockFilter==="low"&&stock>0&&stock<=limit)||
+   (stockFilter==="out"&&stock===0)||
+   (stockFilter==="available"&&stock>Number(limit));
+  return matchSearch&&matchCategory&&matchStock;
+ });
+
+ const stockTotal=products.reduce((s,p)=>s+Number(p.stock||0),0);
+ const low=products.filter(p=>Number(p.stock||0)<=Number(p.lowStockLimit??5));
+ const value=products.reduce((s,p)=>s+Number(p.purchasePrice||0)*Number(p.stock||0),0);
+
+ $("totalProducts").textContent=products.length;
+ $("totalStock").textContent=stockTotal;
+ $("lowStock").textContent=low.length;
+ $("inventoryValue").textContent=money(value);
+ $("countText").textContent=`Showing ${filtered.length} of ${products.length} products`;
+
+ if(!filtered.length){
+  $("productsBody").innerHTML='<tr><td colspan="7" class="empty">No products found. Add your first product.</td></tr>';
+  return;
+ }
+
+ $("productsBody").innerHTML=filtered.map(p=>{
+  const stock=Number(p.stock||0);
+  const limit=Number(p.lowStockLimit??5);
+  const stockClass=stock===0?"out":stock<=limit?"low":"good";
+  const stockLabel=stock===0?"Out of stock":stock<=limit?"Low stock":"Available";
+  return `<tr>
+   <td><b>${safe(p.name)}</b><br><small>${safe(p.unit||"")}</small></td>
+   <td>${safe(p.sku||"—")}</td>
+   <td>${safe(p.category||"—")}</td>
+   <td>${money(p.purchasePrice)}</td>
+   <td><b>${money(p.price)}</b></td>
+   <td><span class="stock ${stockClass}">${stock} units</span><br><small class="${stockClass}">${stockLabel}</small></td>
+   <td><div class="actions">
+    <button onclick="editProduct('${safe(p.id)}')">Edit</button>
+    ${role==="admin"?`<button class="del" onclick="removeProduct('${safe(p.id)}')">Delete</button>`:""}
+   </div></td>
+  </tr>`;
+ }).join("");
+}
+
+window.openModal=(id=null)=>{
+ $("productForm").reset();
+ $("editId").value=id||"";
+ $("lowStockLimit").value=5;
+ $("modalTitle").textContent=id?"Edit Product":"Add New Product";
+ $("saveBtn").textContent=id?"Update Product":"Save Product";
+
+ if(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  $("name").value=p.name||"";
+  $("sku").value=p.sku||"";
+  $("category").value=p.category||"";
+  $("unit").value=p.unit||"";
+  $("purchasePrice").value=p.purchasePrice??0;
+  $("price").value=p.price??0;
+  $("stock").value=p.stock??0;
+  $("lowStockLimit").value=p.lowStockLimit??5;
+  $("description").value=p.description||"";
+ }
+ $("productModal").classList.add("show");
+};
+window.closeModal=()=>$("productModal").classList.remove("show");
+window.editProduct=id=>openModal(id);
+
+$("productForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const name=$("name").value.trim();
+ const sku=$("sku").value.trim();
+ const purchasePrice=Number($("purchasePrice").value);
+ const price=Number($("price").value);
+ const stock=Number($("stock").value);
+ const lowStockLimit=Number($("lowStockLimit").value);
+
+ if(!name){notify("Enter product name.");return;}
+ if(purchasePrice<0||price<0||stock<0||lowStockLimit<0){
+  notify("Price and stock cannot be negative.");return;
+ }
+ if(sku&&products.some(p=>p.sku?.toLowerCase()===sku.toLowerCase()&&p.id!==$("editId").value)){
+  notify("This SKU already exists.");return;
+ }
+
+ const data={
+  name,sku,category:$("category").value,
+  unit:$("unit").value.trim(),
+  purchasePrice,price,stock,lowStockLimit,
+  description:$("description").value.trim(),
+  updatedAt:serverTimestamp()
+ };
+
+ try{
+  $("saveBtn").disabled=true;
+  const id=$("editId").value;
+  if(id){
+   await updateDoc(doc(db,"products",id),data);
+   notify("Product updated successfully.");
+  }else{
+   await addDoc(collection(db,"products"),{
+    ...data,createdAt:serverTimestamp()
+   });
+   notify("Product added successfully.");
+  }
+  closeModal();
+  await loadProducts();
+ }catch(error){
+  console.error(error);
+  notify(error.message||"Unable to save product.");
+ }finally{
+  $("saveBtn").disabled=false;
+ }
+});
+
+window.removeProduct=async id=>{
+ if(role!=="admin"){notify("Only admin can delete products.");return;}
+ const usedInOrders=products.find(p=>p.id===id);
+ if(!usedInOrders)return;
+ if(!confirm("Delete this product? Existing orders will not be deleted."))return;
+ try{
+  await deleteDoc(doc(db,"products",id));
+  notify("Product deleted.");
+  await loadProducts();
+ }catch(e){notify(e.message||"Delete failed.");}
+};
+
+$("productModal").addEventListener("click",e=>{
+ if(e.target===$("productModal"))closeModal();
+});
+</script>
+</body>
+</html>
