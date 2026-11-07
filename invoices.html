@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoices & Billing | Vitex CRM</title>
+<style>
+:root{--blue:#1769d2;--dark:#16345c;--bg:#f4f7fc;--border:#e5eaf2;--text:#26364b;--muted:#718096;--green:#159765;--red:#dc4c4c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:8px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:5px}
+.nav a{display:block;text-decoration:none;color:#526176;padding:12px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:26px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:25px;margin:0 0 6px;color:var(--dark)}
+.sub{font-size:13px;color:var(--muted)}
+.btn{border:0;border-radius:8px;padding:11px 16px;background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+.btn.secondary{background:#eaf2ff;color:var(--blue)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:19px}
+.card .label{font-size:12px;color:var(--muted)}
+.card .number{font-size:24px;font-weight:800;margin-top:9px;color:var(--dark)}
+.panel{background:#fff;border:1px solid var(--border);border-radius:13px;padding:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:17px}
+.toolbar input,.toolbar select{padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff;min-width:170px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--border);font-size:13px}
+th{font-size:11px;color:var(--muted);text-transform:uppercase;background:#fafbfd}
+.badge{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#edf2f7;color:#526176}
+.badge.Paid{background:#e6f7ef;color:#128456}
+.badge.Unpaid{background:#fff0f0;color:#cf4141}
+.badge.Partial{background:#fff5df;color:#a56b00}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{border:0;padding:7px 9px;border-radius:6px;cursor:pointer;background:#edf3fc;color:var(--blue)}
+.modal{display:none;position:fixed;inset:0;background:#14243c88;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:15px;width:100%;max-width:850px;max-height:94vh;overflow:auto;padding:23px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:20px}
+.close{border:0;background:#f0f3f8;border-radius:8px;padding:8px 12px;cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.full{grid-column:1/-1}
+.total-box{background:#edf4ff;border-radius:9px;padding:15px;display:flex;justify-content:space-between;font-weight:800;color:var(--dark);margin-top:12px}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+#notice{position:fixed;right:20px;bottom:20px;background:#183b68;color:#fff;padding:13px 18px;border-radius:9px;display:none;z-index:20;max-width:90vw}
+@media(max-width:950px){.sidebar{width:205px}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:5px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.cards{gap:9px}.card{padding:13px}.card .number{font-size:20px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.top h1{font-size:22px}}
+@media print{
+ body{background:#fff}
+ .sidebar,.top,.cards,.panel,.modal-head,.form-actions,#notice{display:none!important}
+ .modal{display:block!important;position:static;background:#fff;padding:0}
+ .modal-box{max-width:none;max-height:none;overflow:visible;border:0;padding:0}
+ #invoicePrint{display:block!important}
+ .print-actions{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+ <div class="brand">VITEX <small>AYURVEDA CRM</small></div>
+ <nav class="nav">
+  <a href="dashboard.html">▦ Dashboard</a>
+  <a href="customers.html">♙ Customers</a>
+  <a href="orders.html">▤ Orders</a>
+  <a href="products.html">▣ Products</a>
+  <a href="shipping.html">➜ Shipping</a>
+  <a href="invoices.html" class="active">▧ Invoices</a>
+  <a href="followups.html">☎ Follow-ups</a>
+  <a href="reports.html">▥ Reports</a>
+  <a href="settings.html" id="settingsLink">⚙ Settings</a>
+ </nav>
+</aside>
+
+<main class="main">
+ <div class="top">
+  <div><h1>Invoices & Billing</h1><div class="sub">Create GST invoices and manage payments</div></div>
+  <button class="btn" onclick="openModal()">+ Create Invoice</button>
+ </div>
+
+ <section class="cards">
+  <div class="card"><div class="label">Total Invoices</div><div class="number" id="totalInvoices">0</div></div>
+  <div class="card"><div class="label">Paid Amount</div><div class="number" id="paidAmount">₹0</div></div>
+  <div class="card"><div class="label">Outstanding</div><div class="number" id="outstanding">₹0</div></div>
+  <div class="card"><div class="label">Unpaid Invoices</div><div class="number" id="unpaidCount">0</div></div>
+ </section>
+
+ <section class="panel">
+  <div class="toolbar">
+   <input id="search" placeholder="Search invoice / customer..." oninput="renderInvoices()">
+   <select id="statusFilter" onchange="renderInvoices()">
+    <option value="">All Payments</option><option>Paid</option><option>Unpaid</option><option>Partial</option>
+   </select>
+   <button class="btn secondary" onclick="loadInvoices()">↻ Refresh</button>
+  </div>
+  <div class="table-wrap">
+   <table>
+    <thead><tr><th>Invoice No.</th><th>Customer</th><th>Date</th><th>Order ID</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="invoiceBody"><tr><td colspan="9" class="empty">Loading invoices...</td></tr></tbody>
+   </table>
+  </div>
+  <div id="countText" class="sub" style="margin-top:15px"></div>
+ </section>
+</main>
+</div>
+
+<div class="modal" id="invoiceModal">
+<div class="modal-box">
+ <div class="modal-head">
+  <h2 id="modalTitle">Create GST Invoice</h2>
+  <button class="close" onclick="closeModal()">✕</button>
+ </div>
+
+ <div id="invoiceFormArea">
+ <form id="invoiceForm">
+  <input type="hidden" id="editId">
+  <div class="form-grid">
+   <div class="field">
+    <label>Select Order *</label>
+    <select id="orderSelect" required><option value="">Select order</option></select>
+   </div>
+   <div class="field">
+    <label>Invoice Date *</label>
+    <input type="date" id="invoiceDate" required>
+   </div>
+   <div class="field">
+    <label>Customer Name *</label>
+    <input id="customerName" required>
+   </div>
+   <div class="field">
+    <label>Customer GSTIN (Optional)</label>
+    <input id="customerGSTIN" maxlength="15" placeholder="15 digit GSTIN">
+   </div>
+   <div class="field">
+    <label>Customer Phone</label>
+    <input id="customerPhone">
+   </div>
+   <div class="field">
+    <label>Place of Supply / State</label>
+    <input id="customerState" placeholder="Customer state">
+   </div>
+   <div class="field full">
+    <label>Billing Address</label>
+    <input id="customerAddress" placeholder="Customer billing address">
+   </div>
+   <div class="field">
+    <label>Business / Seller Name</label>
+    <input id="sellerName" placeholder="Vitex Ayurveda">
+   </div>
+   <div class="field">
+    <label>Seller GSTIN</label>
+    <input id="sellerGSTIN" maxlength="15" placeholder="Your GSTIN">
+   </div>
+   <div class="field">
+    <label>Product / Description</label>
+    <input id="description" required>
+   </div>
+   <div class="field">
+    <label>Quantity</label>
+    <input type="number" id="quantity" min="1" value="1" required>
+   </div>
+   <div class="field">
+    <label>Taxable Amount (₹)</label>
+    <input type="number" id="taxableAmount" min="0" step="0.01" required>
+   </div>
+   <div class="field">
+    <label>GST Rate</label>
+    <select id="gstRate">
+     <option value="0">0%</option><option value="5">5%</option>
+     <option value="12">12%</option><option value="18" selected>18%</option><option value="28">28%</option>
+    </select>
+   </div>
+   <div class="field">
+    <label>Tax Type</label>
+    <select id="taxType"><option value="intra">CGST + SGST</option><option value="inter">IGST</option></select>
+   </div>
+   <div class="field">
+    <label>Discount (₹)</label>
+    <input type="number" id="discount" min="0" value="0" step="0.01">
+   </div>
+   <div class="field">
+    <label>Amount Already Paid (₹)</label>
+    <input type="number" id="paidAmountInput" min="0" value="0" step="0.01">
+   </div>
+   <div class="field">
+    <label>Payment Mode</label>
+    <select id="paymentMode"><option>Cash</option><option>UPI</option><option>Bank Transfer</option><option>Card</option><option>COD</option></select>
+   </div>
+   <div class="field">
+    <label>Transaction Reference</label>
+    <input id="transactionRef" placeholder="UTR / Transaction ID">
+   </div>
+   <div class="field full">
+    <label>Notes / Terms</label>
+    <input id="invoiceNotes" placeholder="Payment terms or invoice notes">
+   </div>
+  </div>
+  <div class="total-box"><span>Grand Total (Including GST)</span><span id="grandTotal">₹0.00</span></div>
+  <div class="sub" id="taxBreakup" style="margin-top:10px"></div>
+  <div class="form-actions">
+   <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
+   <button type="submit" class="btn" id="saveBtn">Save Invoice</button>
+  </div>
+ </form>
+ </div>
+
+ <div id="invoicePrint" style="display:none">
+  <div class="print-actions" style="text-align:right;margin-bottom:15px">
+   <button class="btn" onclick="window.print()">Print / Save PDF</button>
+   <button class="btn secondary" onclick="closeModal()">Close</button>
+  </div>
+  <div id="printContent"></div>
+ </div>
+</div>
+</div>
+<div id="notice"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,getDocs,addDoc,updateDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+let role="",orders=[],invoices=[],currentInvoice=null;
+const $=id=>document.getElementById(id);
+const money=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function notify(msg){$("notice").textContent=msg;$("notice").style.display="block";setTimeout(()=>$("notice").style.display="none",3000);}
+function today(){return new Date().toISOString().slice(0,10);}
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return;}
+ try{
+  const s=await getDoc(doc(db,"users",user.uid));
+  if(!s.exists())throw new Error("User role not configured.");
+  const u=s.data();role=u.role;
+  if(!["admin","staff"].includes(role)||u.active===false)throw new Error("Account inactive or unauthorized.");
+  if(role==="staff")$("settingsLink").style.display="none";
+  await loadOrders();await loadInvoices();
+ }catch(e){console.error(e);notify(e.message||"Unable to load billing data.");}
+});
+
+async function loadOrders(){
+ const snap=await getDocs(collection(db,"orders"));
+ orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+ const invoiced=new Set(invoices.map(i=>i.orderId).filter(Boolean));
+ const available=orders.filter(o=>!invoiced.has(o.id));
+ $("orderSelect").innerHTML='<option value="">Select order</option>'+available.map(o=>
+ `<option value="${safe(o.id)}">${safe(o.orderId||o.id.slice(0,8))} — ${safe(o.customerName||"Customer")} — ${money(o.totalAmount)}</option>`).join("");
+}
+async function loadInvoices(){
+ const snap=await getDocs(collection(db,"invoices"));
+ invoices=snap.docs.map(d=>({id:d.id,...d.data()}));
+ invoices.sort((a,b)=>String(b.invoiceDate||"").localeCompare(String(a.invoiceDate||"")));
+ renderInvoices();await loadOrders();
+}
+window.loadInvoices=async()=>{try{await loadInvoices();notify("Invoices refreshed.");}catch(e){notify(e.message);}};
+window.renderInvoices=renderInvoices;
+
+function renderInvoices(){
+ const search=$("search").value.toLowerCase(),status=$("statusFilter").value;
+ const filtered=invoices.filter(i=>
+  [i.invoiceNumber,i.customerName,i.orderNumber].join(" ").toLowerCase().includes(search)&&(!status||i.paymentStatus===status)
+ );
+ $("totalInvoices").textContent=invoices.length;
+ $("paidAmount").textContent=money(invoices.reduce((s,i)=>s+Number(i.paidAmount||0),0));
+ $("outstanding").textContent=money(invoices.reduce((s,i)=>s+Number(i.balance||0),0));
+ $("unpaidCount").textContent=invoices.filter(i=>i.paymentStatus==="Unpaid").length;
+ $("countText").textContent=`Showing ${filtered.length} of ${invoices.length} invoices`;
+ if(!filtered.length){$("invoiceBody").innerHTML='<tr><td colspan="9" class="empty">No invoices found.</td></tr>';return;}
+ $("invoiceBody").innerHTML=filtered.map(i=>`
+ <tr>
+ <td><b>${safe(i.invoiceNumber||"—")}</b></td>
+ <td>${safe(i.customerName||"—")}</td>
+ <td>${safe(i.invoiceDate||"—")}</td>
+ <td>${safe(i.orderNumber||"—")}</td>
+ <td>${money(i.grandTotal)}</td>
+ <td>${money(i.paidAmount)}</td>
+ <td>${money(i.balance)}</td>
+ <td><span class="badge ${safe(i.paymentStatus)}">${safe(i.paymentStatus)}</span></td>
+ <td><div class="actions">
+ <button onclick="viewInvoice('${safe(i.id)}')">View / PDF</button>
+ <button onclick="recordPayment('${safe(i.id)}')">Payment</button>
+ </div></td>
+ </tr>`).join("");
+}
+
+function calculate(){
+ const taxable=Math.max(0,Number($("taxableAmount").value)||0);
+ const discount=Math.max(0,Number($("discount").value)||0);
+ const rate=Number($("gstRate").value)||0;
+ const base=Math.max(0,taxable-discount);
+ const tax=base*rate/100;
+ const intra=$("taxType").value==="intra";
+ const cgst=intra?tax/2:0,sgst=intra?tax/2:0,igst=intra?0:tax;
+ const total=base+tax;
+ $("grandTotal").textContent=money(total);
+ $("taxBreakup").textContent=intra?
+ `Taxable: ${money(base)} | CGST: ${money(cgst)} | SGST: ${money(sgst)} | Total GST: ${money(tax)}`:
+ `Taxable: ${money(base)} | IGST: ${money(igst)} | Total GST: ${money(tax)}`;
+ return {taxable:base,gstRate:rate,cgst,sgst,igst,total};
+}
+["taxableAmount","discount","gstRate","taxType"].forEach(id=>$(id).addEventListener("input",calculate));
+["taxableAmount","discount","gstRate","taxType"].forEach(id=>$(id).addEventListener("change",calculate));
+
+$("orderSelect").addEventListener("change",()=>{
+ const o=orders.find(x=>x.id===$("orderSelect").value);if(!o)return;
+ $("customerName").value=o.customerName||"";
+ $("customerPhone").value=o.phone||"";
+ $("customerAddress").value=o.address||"";
+ $("description").value=o.productName||"";
+ $("quantity").value=o.quantity||1;
+ $("taxableAmount").value=o.totalAmount||0;
+ $("paidAmountInput").value=0;
+ calculate();
+});
+
+window.openModal=()=>{
+ $("invoiceForm").reset();
+ $("editId").value="";
+ $("invoiceDate").value=today();
+ $("modalTitle").textContent="Create GST Invoice";
+ $("invoiceFormArea").style.display="block";
+ $("invoicePrint").style.display="none";
+ $("invoiceModal").classList.add("show");
+ calculate();
+};
+window.closeModal=()=>$("invoiceModal").classList.remove("show");
+
+$("invoiceForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const order=orders.find(o=>o.id===$("orderSelect").value);
+ if(!order){notify("Please select an order.");return;}
+ const calc=calculate();
+ const paid=Number($("paidAmountInput").value)||0;
+ if(paid<0||paid>calc.total){notify("Paid amount cannot exceed invoice total.");return;}
+ const gstin=$("customerGSTIN").value.trim().toUpperCase();
+ if(gstin&&!/^[0-9A-Z]{15}$/.test(gstin)){notify("Check customer GSTIN format.");return;}
+ const sellerGSTIN=$("sellerGSTIN").value.trim().toUpperCase();
+ if(sellerGSTIN&&!/^[0-9A-Z]{15}$/.test(sellerGSTIN)){notify("Check seller GSTIN format.");return;}
+ const balance=Math.max(0,calc.total-paid);
+ const paymentStatus=balance===0?"Paid":paid>0?"Partial":"Unpaid";
+ const data={
+  orderId:order.id,orderNumber:order.orderId||order.id.slice(0,8),
+  invoiceDate:$("invoiceDate").value,
+  customerName:$("customerName").value.trim(),
+  customerGSTIN:gstin,customerPhone:$("customerPhone").value.trim(),
+  customerState:$("customerState").value.trim(),
+  customerAddress:$("customerAddress").value.trim(),
+  sellerName:$("sellerName").value.trim(),
+  sellerGSTIN,
+  description:$("description").value.trim(),
+  quantity:Number($("quantity").value)||1,
+  taxableAmount:calc.taxable,gstRate:calc.gstRate,
+  cgst:calc.cgst,sgst:calc.sgst,igst:calc.igst,
+  discount:Number($("discount").value)||0,
+  grandTotal:calc.total,paidAmount:paid,balance,paymentStatus,
+  paymentMode:$("paymentMode").value,
+  transactionRef:$("transactionRef").value.trim(),
+  notes:$("invoiceNotes").value.trim(),
+  updatedAt:serverTimestamp()
+ };
+ try{
+  $("saveBtn").disabled=true;
+  const invoiceNumber="VTX-INV-"+Date.now().toString().slice(-8);
+  await addDoc(collection(db,"invoices"),{
+   ...data,invoiceNumber,createdAt:serverTimestamp()
+  });
+  notify("Invoice created: "+invoiceNumber);
+  closeModal();await loadInvoices();
+ }catch(err){console.error(err);notify(err.message||"Invoice save failed.");}
+ finally{$("saveBtn").disabled=false;}
+});
+
+window.viewInvoice=id=>{
+ const i=invoices.find(x=>x.id===id);if(!i)return;
+ currentInvoice=i;
+ const taxRows=i.igst>0?
+ `<tr><td>IGST</td><td>${money(i.igst)}</td></tr>`:
+ `<tr><td>CGST</td><td>${money(i.cgst)}</td></tr><tr><td>SGST</td><td>${money(i.sgst)}</td></tr>`;
+ $("invoiceFormArea").style.display="none";
+ $("modalTitle").textContent="Invoice "+(i.invoiceNumber||"");
+ $("printContent").innerHTML=`
+ <div style="font-family:Arial;color:#26364b;padding:20px">
+  <div style="display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #1769d2;padding-bottom:18px">
+   <div><h1 style="color:#1769d2">VITEX</h1><b>${safe(i.sellerName||"Vitex Ayurveda")}</b><br>GSTIN: ${safe(i.sellerGSTIN||"Not provided")}</div>
+   <div style="text-align:right"><h2>TAX INVOICE</h2><b>${safe(i.invoiceNumber)}</b><br>Date: ${safe(i.invoiceDate)}</div>
+  </div>
+  <h3>Bill To</h3>
+  <b>${safe(i.customerName)}</b><br>${safe(i.customerAddress||"")}<br>Phone: ${safe(i.customerPhone||"—")}<br>GSTIN: ${safe(i.customerGSTIN||"—")}
+  <p>Order: ${safe(i.orderNumber||"—")} | Place of Supply: ${safe(i.customerState||"—")}</p>
+  <table style="min-width:0;width:100%;margin-top:20px">
+   <thead><tr><th>Description</th><th>Qty</th><th>Taxable</th><th>GST Rate</th><th>Total</th></tr></thead>
+   <tbody><tr><td>${safe(i.description)}</td><td>${safe(i.quantity)}</td><td>${money(i.taxableAmount)}</td><td>${safe(i.gstRate)}%</td><td>${money(i.grandTotal)}</td></tr></tbody>
+  </table>
+  <table style="min-width:0;width:100%;max-width:350px;margin:20px 0 20px auto">
+   <tbody><tr><td>Discount</td><td>${money(i.discount)}</td></tr>${taxRows}
+   <tr><td><b>Grand Total</b></td><td><b>${money(i.grandTotal)}</b></td></tr>
+   <tr><td>Paid</td><td>${money(i.paidAmount)}</td></tr>
+   <tr><td>Balance</td><td>${money(i.balance)}</td></tr></tbody>
+  </table>
+  <p>Payment Status: <b>${safe(i.paymentStatus)}</b> | Mode: ${safe(i.paymentMode||"—")}</p>
+  <p>Transaction Reference: ${safe(i.transactionRef||"—")}</p>
+  <p>Notes: ${safe(i.notes||"—")}</p>
+  <hr><p style="text-align:center;font-size:12px">This is a computer-generated invoice.</p>
+ </div>`;
+ $("invoicePrint").style.display="block";
+ $("invoiceModal").classList.add("show");
+};
+
+window.recordPayment=async id=>{
+ const i=invoices.find(x=>x.id===id);if(!i)return;
+ const remaining=Number(i.balance)||0;
+ if(remaining<=0){notify("Invoice is already fully paid.");return;}
+ const amountText=prompt("Enter payment amount. Outstanding: "+money(remaining));
+ if(amountText===null)return;
+ const amount=Number(amountText);
+ if(!Number.isFinite(amount)||amount<=0||amount>remaining){notify("Enter a valid amount up to "+money(remaining));return;}
+ const mode=prompt("Payment mode: UPI / Cash / Bank Transfer / Card","UPI");
+ if(mode===null)return;
+ const ref=prompt("Transaction reference (optional)","")||"";
+ const newPaid=Number(i.paidAmount||0)+amount;
+ const newBalance=Math.max(0,Number(i.grandTotal)-newPaid);
+ const newStatus=newBalance===0?"Paid":"Partial";
+ try{
+  await updateDoc(doc(db,"invoices",id),{
+   paidAmount:newPaid,balance:newBalance,paymentStatus:newStatus,
+   lastPaymentMode:mode,lastTransactionRef:ref,updatedAt:serverTimestamp()
+  });
+  await addDoc(collection(db,"payments"),{
+   invoiceId:id,invoiceNumber:i.invoiceNumber,orderId:i.orderId,
+   customerName:i.customerName,amount,paymentMode:mode,
+   transactionRef:ref,createdAt:serverTimestamp()
+  });
+  notify("Payment recorded successfully.");
+  await loadInvoices();
+ }catch(e){console.error(e);notify(e.message||"Payment update failed.");}
+};
+
+$("invoiceModal").addEventListener("click",e=>{if(e.target===$("invoiceModal"))closeModal();});
+</script>
+</body>
+</html>
