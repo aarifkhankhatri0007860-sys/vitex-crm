@@ -1,0 +1,314 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Follow-ups | Vitex CRM</title>
+<style>
+:root{--blue:#1769e0;--dark:#14243a;--bg:#f4f7fc;--muted:#718096;--border:#e5eaf2;--green:#159b69;--red:#dc4b4b;--orange:#d88718}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--dark)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:5px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px}
+.nav a{display:block;text-decoration:none;color:#536278;padding:12px 13px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:25px 30px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:25px}
+.top h1{font-size:25px;margin:0}
+.top p{color:var(--muted);font-size:13px;margin:7px 0 0}
+.user{font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}
+.stat,.panel{background:#fff;border:1px solid var(--border);border-radius:13px;padding:18px}
+.stat span{font-size:12px;color:var(--muted)}
+.stat strong{display:block;font-size:27px;margin-top:9px}
+.stat:nth-child(2) strong{color:var(--orange)}
+.stat:nth-child(3) strong{color:var(--blue)}
+.stat:nth-child(4) strong{color:var(--green)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;flex-wrap:wrap}
+.toolbar h2{font-size:17px;margin:0}
+button{border:0;border-radius:8px;padding:11px 15px;cursor:pointer;font-weight:700;font-size:13px}
+.primary{background:var(--blue);color:#fff}
+.secondary{background:#edf3ff;color:var(--blue)}
+.danger{background:#fff0f0;color:var(--red)}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #dce3ee;border-radius:8px;font:14px Arial;background:#fff;color:var(--dark)}
+.filters input{max-width:290px}
+.filters select{width:auto;min-width:150px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{text-align:left;padding:13px 12px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted);font-weight:700;background:#fafbfd}
+td{vertical-align:middle}
+.muted{color:var(--muted);font-size:12px}
+.pill{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;font-weight:700;background:#edf2f7;color:#526174}
+.pill.pending,.pill.callback{background:#fff3dc;color:#a66a0b}
+.pill.completed,.pill.interested{background:#e3f7ee;color:#138357}
+.pill.not-answered{background:#ffeded;color:#c23d3d}
+.pill.not-interested{background:#edf0f5;color:#667085}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:7px 9px;font-size:11px}
+.empty{text-align:center;padding:35px;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#10203988;z-index:10;align-items:center;justify-content:center;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:14px;width:100%;max-width:650px;max-height:92vh;overflow:auto;padding:23px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{font-size:19px;margin:0}
+.close{background:#edf1f7;color:#344054}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+.field.full{grid-column:1/-1}
+.form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+#message{font-size:13px;margin:10px 0;color:var(--green)}
+@media(max-width:900px){.sidebar{width:205px}.stats{grid-template-columns:repeat(2,1fr)}.main{padding:20px}}
+@media(max-width:600px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:4px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.top h1{font-size:21px}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:23px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">VITEX CRM<small>BUSINESS MANAGEMENT</small></div>
+<nav class="nav">
+<a href="dashboard.html">Dashboard</a>
+<a href="customers.html">Customers</a>
+<a href="orders.html">Orders</a>
+<a href="products.html">Products</a>
+<a href="shipping.html">Shipping</a>
+<a href="invoices.html">Invoices</a>
+<a class="active" href="followups.html">Follow-ups</a>
+<a href="reports.html">Reports</a>
+<a id="settingsLink" href="settings.html">Settings</a>
+<a href="#" id="logoutBtn">Logout</a>
+</nav>
+</aside>
+<main class="main">
+<div class="top">
+<div><h1>Follow-up Management</h1><p>Manage customer calls, remarks and upcoming follow-ups.</p></div>
+<div class="user" id="userInfo">Loading user...</div>
+</div>
+
+<div class="stats">
+<div class="stat"><span>Total Follow-ups</span><strong id="totalCount">0</strong></div>
+<div class="stat"><span>Due Today</span><strong id="dueCount">0</strong></div>
+<div class="stat"><span>Upcoming</span><strong id="upcomingCount">0</strong></div>
+<div class="stat"><span>Completed</span><strong id="completedCount">0</strong></div>
+</div>
+
+<section class="panel">
+<div class="toolbar">
+<h2>Customer Follow-up Records</h2>
+<button class="primary" id="addBtn">+ Add Follow-up</button>
+</div>
+<div class="filters">
+<input id="search" placeholder="Search customer, phone or remarks...">
+<select id="statusFilter">
+<option value="">All Statuses</option>
+<option>Pending</option><option>Completed</option>
+<option>Not Answered</option><option>Interested</option>
+<option>Not Interested</option><option>Callback Requested</option>
+</select>
+<select id="dateFilter">
+<option value="">All Dates</option>
+<option value="today">Due Today</option>
+<option value="upcoming">Upcoming</option>
+<option value="overdue">Overdue</option>
+</select>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr>
+<th>Customer</th><th>Phone</th><th>Call Date</th>
+<th>Next Follow-up</th><th>Priority</th><th>Status</th><th>Remarks</th><th>Actions</th>
+</tr></thead>
+<tbody id="followupRows"><tr><td colspan="8" class="empty">Loading records...</td></tr></tbody>
+</table>
+</div>
+<div id="message"></div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="formModal">
+<div class="modal-box">
+<div class="modal-head"><h2 id="modalTitle">Add Follow-up</h2><button class="close" id="closeModal">✕</button></div>
+<form id="followupForm">
+<input type="hidden" id="recordId">
+<div class="form-grid">
+<div class="field full"><label>Customer *</label><select id="customerId" required><option value="">Select Customer</option></select></div>
+<div class="field"><label>Related Order (Optional)</label><select id="orderId"><option value="">No order selected</option></select></div>
+<div class="field"><label>Call Date *</label><input type="datetime-local" id="callDate" required></div>
+<div class="field"><label>Call Outcome / Status *</label><select id="status" required>
+<option>Pending</option><option>Completed</option><option>Not Answered</option><option>Interested</option><option>Not Interested</option><option>Callback Requested</option>
+</select></div>
+<div class="field"><label>Priority</label><select id="priority"><option>Normal</option><option>High</option><option>Urgent</option></select></div>
+<div class="field"><label>Next Follow-up Date</label><input type="datetime-local" id="nextDate"></div>
+<div class="field"><label>Assigned To</label><input id="assignedTo" placeholder="Staff name (optional)"></div>
+<div class="field full"><label>Call Remarks *</label><textarea id="remarks" rows="3" placeholder="Customer se hui baat aur details..." required></textarea></div>
+</div>
+<div class="form-actions"><button type="button" class="secondary" id="cancelBtn">Cancel</button><button type="submit" class="primary" id="saveBtn">Save Follow-up</button></div>
+</form>
+</div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,getDocs,addDoc,updateDoc,deleteDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+let currentUser=null,userRole="staff",customers=[],orders=[],records=[];
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString("en-CA");
+const localDateTime=()=>{
+ const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+ return d.toISOString().slice(0,16);
+};
+const escapeHTML=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dateOnly=value=>String(value||"").slice(0,10);
+const formatDate=value=>{
+ if(!value)return "—";
+ const d=new Date(value);
+ return isNaN(d)?"—":d.toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});
+};
+function notify(msg,error=false){
+ $("message").textContent=msg;
+ $("message").style.color=error?"#dc4b4b":"#159b69";
+}
+function openModal(record=null){
+ $("followupForm").reset();
+ $("recordId").value=record?.id||"";
+ $("modalTitle").textContent=record?"Edit Follow-up":"Add Follow-up";
+ $("callDate").value=record?.callDate||localDateTime();
+ $("customerId").value=record?.customerId||"";
+ $("orderId").value=record?.orderId||"";
+ $("status").value=record?.status||"Pending";
+ $("priority").value=record?.priority||"Normal";
+ $("nextDate").value=record?.nextFollowUpDate||"";
+ $("assignedTo").value=record?.assignedTo||"";
+ $("remarks").value=record?.remarks||"";
+ $("formModal").classList.add("show");
+}
+function closeModal(){$("formModal").classList.remove("show")}
+function populateOptions(){
+ $("customerId").innerHTML='<option value="">Select Customer</option>'+customers.map(c=>`<option value="${escapeHTML(c.id)}">${escapeHTML(c.name||"Unnamed")} — ${escapeHTML(c.phone||"")}</option>`).join("");
+ $("orderId").innerHTML='<option value="">No order selected</option>'+orders.map(o=>`<option value="${escapeHTML(o.id)}">${escapeHTML(o.orderId||o.id)} — ${escapeHTML(o.customerName||"Customer")}</option>`).join("");
+}
+function render(){
+ const q=$("search").value.toLowerCase().trim(),status=$("statusFilter").value,dateFilter=$("dateFilter").value;
+ const now=today();
+ $("totalCount").textContent=records.length;
+ $("dueCount").textContent=records.filter(r=>dateOnly(r.nextFollowUpDate)===now&&r.status!=="Completed").length;
+ $("upcomingCount").textContent=records.filter(r=>dateOnly(r.nextFollowUpDate)>now&&r.status!=="Completed").length;
+ $("completedCount").textContent=records.filter(r=>r.status==="Completed").length;
+ let filtered=records.filter(r=>{
+  const hay=[r.customerName,r.phone,r.remarks,r.assignedTo].join(" ").toLowerCase();
+  if(q&&!hay.includes(q))return false;
+  if(status&&r.status!==status)return false;
+  const d=dateOnly(r.nextFollowUpDate);
+  if(dateFilter==="today"&&d!==now)return false;
+  if(dateFilter==="upcoming"&&!(d>now))return false;
+  if(dateFilter==="overdue"&&!(d&&d<now&&r.status!=="Completed"))return false;
+  return true;
+ });
+ filtered.sort((a,b)=>(b.nextFollowUpDate||"").localeCompare(a.nextFollowUpDate||""));
+ $("followupRows").innerHTML=filtered.length?filtered.map(r=>{
+  const cls=(r.status||"Pending").toLowerCase().replaceAll(" ","-");
+  return `<tr>
+  <td><b>${escapeHTML(r.customerName||"Unknown")}</b><div class="muted">${escapeHTML(r.assignedTo||"Unassigned")}</div></td>
+  <td>${escapeHTML(r.phone||"—")} ${r.phone?`<a href="tel:${encodeURIComponent(r.phone)}">Call</a>`:""}</td>
+  <td>${escapeHTML(formatDate(r.callDate))}</td>
+  <td>${escapeHTML(formatDate(r.nextFollowUpDate))}</td>
+  <td>${escapeHTML(r.priority||"Normal")}</td>
+  <td><span class="pill ${cls}">${escapeHTML(r.status||"Pending")}</span></td>
+  <td>${escapeHTML(r.remarks||"—")}</td>
+  <td><div class="actions"><button class="secondary" data-edit="${escapeHTML(r.id)}">Edit</button>${userRole==="admin"?`<button class="danger" data-delete="${escapeHTML(r.id)}">Delete</button>`:""}</div></td>
+  </tr>`;
+ }).join(""):'<tr><td colspan="8" class="empty">No follow-up records found.</td></tr>';
+}
+async function loadData(){
+ const [cSnap,oSnap,fSnap]=await Promise.all([
+  getDocs(collection(db,"customers")),getDocs(collection(db,"orders")),getDocs(collection(db,"followups"))
+ ]);
+ customers=cSnap.docs.map(d=>({id:d.id,...d.data()}));
+ orders=oSnap.docs.map(d=>({id:d.id,...d.data()}));
+ records=fSnap.docs.map(d=>({id:d.id,...d.data()}));
+ populateOptions();render();
+}
+$("addBtn").addEventListener("click",()=>openModal());
+$("closeModal").addEventListener("click",closeModal);
+$("cancelBtn").addEventListener("click",closeModal);
+$("search").addEventListener("input",render);
+$("statusFilter").addEventListener("change",render);
+$("dateFilter").addEventListener("change",render);
+$("followupRows").addEventListener("click",async e=>{
+ const edit=e.target.closest("[data-edit]");
+ const del=e.target.closest("[data-delete]");
+ if(edit){const r=records.find(x=>x.id===edit.dataset.edit);if(r)openModal(r)}
+ if(del){
+  if(!confirm("Delete this follow-up record?"))return;
+  try{await deleteDoc(doc(db,"followups",del.dataset.delete));await loadData();notify("Follow-up deleted successfully.");}
+  catch(err){notify(err.message,true)}
+ }
+});
+$("followupForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const customer=customers.find(c=>c.id===$("customerId").value);
+ if(!customer){notify("Please select a customer.",true);return}
+ const selectedOrder=orders.find(o=>o.id===$("orderId").value);
+ const data={
+  customerId:customer.id,
+  customerName:customer.name||"",
+  phone:customer.phone||"",
+  orderId:selectedOrder?.id||"",
+  orderNumber:selectedOrder?.orderId||"",
+  callDate:$("callDate").value,
+  status:$("status").value,
+  priority:$("priority").value,
+  nextFollowUpDate:$("nextDate").value,
+  assignedTo:$("assignedTo").value.trim(),
+  remarks:$("remarks").value.trim(),
+  updatedAt:serverTimestamp()
+ };
+ if(!data.remarks){notify("Please enter call remarks.",true);return}
+ $("saveBtn").disabled=true;
+ try{
+  const id=$("recordId").value;
+  if(id)await updateDoc(doc(db,"followups",id),data);
+  else{data.createdBy=currentUser.uid;data.createdAt=serverTimestamp();await addDoc(collection(db,"followups"),data)}
+  closeModal();await loadData();notify(id?"Follow-up updated successfully.":"Follow-up saved successfully.");
+ }catch(err){notify("Save failed: "+err.message,true)}
+ finally{$("saveBtn").disabled=false}
+});
+$("logoutBtn").addEventListener("click",async e=>{e.preventDefault();await signOut(auth);location.href="index.html"});
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return}
+ currentUser=user;
+ try{
+  const userSnap=await getDoc(doc(db,"users",user.uid));
+  if(!userSnap.exists()){await signOut(auth);location.href="index.html";return}
+  const profile=userSnap.data();
+  userRole=profile.role||"staff";
+  if(!["admin","staff"].includes(userRole)||profile.active===false){await signOut(auth);location.href="index.html";return}
+  $("userInfo").textContent=profile.name||user.email;
+  if(userRole!=="admin")$("settingsLink").style.display="none";
+  await loadData();
+ }catch(err){notify("Unable to load CRM data: "+err.message,true)}
+});
+</script>
+</body>
+</html>
