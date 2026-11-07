@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Settings | Vitex CRM</title>
+<style>
+:root{--blue:#1769e0;--dark:#172b46;--bg:#f4f7fc;--muted:#718096;--border:#e5eaf2;--green:#159b69;--red:#dc4b4b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--dark)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:white;border-right:1px solid var(--border);padding:22px 15px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:var(--blue);padding:5px 12px 25px}
+.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px}
+.nav a{display:block;text-decoration:none;color:#536278;padding:12px 13px;border-radius:9px;margin:4px 0;font-size:14px}
+.nav a:hover,.nav a.active{background:#eaf2ff;color:var(--blue);font-weight:700}
+.main{flex:1;min-width:0;padding:26px 30px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:25px;margin:0}
+.sub{font-size:13px;color:var(--muted);margin-top:7px}
+.user{font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{background:white;color:#526174;border:1px solid var(--border)}
+.tab.active{background:var(--blue);color:white}
+.panel{background:white;border:1px solid var(--border);border-radius:13px;padding:22px;margin-bottom:18px}
+.panel h2{font-size:17px;margin:0 0 6px}
+.description{font-size:12px;color:var(--muted);margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}
+input,textarea,select{width:100%;padding:11px;border:1px solid #dce3ee;border-radius:8px;font:14px Arial;background:white;color:var(--dark)}
+textarea{resize:vertical}
+.full{grid-column:1/-1}
+button{border:0;border-radius:8px;padding:11px 15px;font-size:13px;font-weight:700;cursor:pointer}
+.primary{background:var(--blue);color:white}
+.secondary{background:#eaf2ff;color:var(--blue)}
+.danger{background:#fff0f0;color:var(--red)}
+.actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+.notice{padding:12px;border-radius:8px;background:#fff8e8;color:#95600c;font-size:12px;margin-bottom:15px;line-height:1.5}
+.success-msg{color:var(--green);font-size:13px;margin-top:12px}
+.error-msg{color:var(--red);font-size:13px;margin-top:12px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+th,td{text-align:left;padding:13px 11px;border-bottom:1px solid var(--border);font-size:13px}
+th{background:#fafbfd;color:var(--muted);font-size:11px}
+.badge{display:inline-block;border-radius:20px;padding:5px 9px;background:#e3f7ee;color:#138357;font-size:11px;font-weight:700}
+.badge.off{background:#ffeded;color:#c23d3d}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+.profile-box{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.avatar{width:52px;height:52px;border-radius:50%;background:#eaf2ff;color:var(--blue);display:grid;place-items:center;font-size:22px;font-weight:800}
+.profile-box strong{display:block;font-size:15px}
+.profile-box small{display:block;color:var(--muted);margin-top:5px}
+.hidden{display:none!important}
+@media(max-width:900px){.sidebar{width:205px}}
+@media(max-width:600px){.layout{display:block}.sidebar{width:100%;padding:12px}.brand{padding:5px 8px 12px}.nav{display:flex;overflow-x:auto;gap:4px}.nav a{white-space:nowrap;padding:9px}.main{padding:16px}.grid{grid-template-columns:1fr}.full{grid-column:auto}h1{font-size:21px}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">VITEX CRM<small>BUSINESS MANAGEMENT</small></div>
+<nav class="nav">
+<a href="dashboard.html">Dashboard</a>
+<a href="customers.html">Customers</a>
+<a href="orders.html">Orders</a>
+<a href="products.html">Products</a>
+<a href="shipping.html">Shipping</a>
+<a href="invoices.html">Invoices</a>
+<a href="followups.html">Follow-ups</a>
+<a href="reports.html">Reports</a>
+<a class="active" href="settings.html">Settings</a>
+<a href="#" id="logoutBtn">Logout</a>
+</nav>
+</aside>
+
+<main class="main">
+<div class="top">
+<div><h1>Settings</h1><div class="sub">Manage your company profile and CRM users.</div></div>
+<div class="user" id="userInfo">Loading...</div>
+</div>
+
+<div class="tabs">
+<button class="tab active" data-tab="company">Company Profile</button>
+<button class="tab" data-tab="staff">Staff Management</button>
+<button class="tab" data-tab="account">My Account</button>
+</div>
+
+<section id="companySection" class="panel">
+<h2>Company Information</h2>
+<div class="description">Business details used throughout your Vitex CRM workspace.</div>
+<div class="notice">Company details are saved in Firestore under the companySettings/main document. These details do not automatically change previously created invoices.</div>
+<form id="companyForm">
+<div class="grid">
+<div class="field"><label>Company / Business Name *</label><input id="companyName" required placeholder="Your company name"></div>
+<div class="field"><label>Business Email</label><input id="companyEmail" type="email" placeholder="business@example.com"></div>
+<div class="field"><label>Phone Number</label><input id="companyPhone" type="tel" placeholder="Business phone"></div>
+<div class="field"><label>Website</label><input id="companyWebsite" type="url" placeholder="https://example.com"></div>
+<div class="field"><label>GSTIN</label><input id="gstin" maxlength="15" placeholder="15-character GSTIN"></div>
+<div class="field"><label>PAN</label><input id="pan" maxlength="10" placeholder="PAN number"></div>
+<div class="field"><label>Business Type</label><select id="businessType">
+<option value="">Select business type</option>
+<option>Proprietorship</option><option>Partnership</option>
+<option>Private Limited</option><option>Public Limited</option>
+<option>LLP</option><option>Other</option>
+</select></div>
+<div class="field"><label>State</label><input id="state" placeholder="State"></div>
+<div class="field full"><label>Business Address</label><textarea id="address" rows="3" placeholder="Complete business address"></textarea></div>
+<div class="field"><label>City</label><input id="city" placeholder="City"></div>
+<div class="field"><label>PIN Code</label><input id="pin" maxlength="6" placeholder="PIN code"></div>
+</div>
+<div class="actions"><button class="primary" id="saveCompany" type="submit">Save Company Details</button></div>
+<div id="companyMessage"></div>
+</form>
+</section>
+
+<section id="staffSection" class="panel hidden">
+<h2>Staff Management</h2>
+<div class="description">View staff accounts and manage their active status.</div>
+<div class="notice">This section only updates existing staff profiles. It does not create Firebase Authentication accounts. Staff permissions must also be enforced using Firestore Security Rules.</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Account Status</th><th>Action</th></tr></thead>
+<tbody id="staffRows"><tr><td colspan="5" class="empty">Loading staff...</td></tr></tbody>
+</table>
+</div>
+<div id="staffMessage"></div>
+</section>
+
+<section id="accountSection" class="panel hidden">
+<h2>My Account</h2>
+<div class="description">Your currently signed-in CRM account information.</div>
+<div class="profile-box">
+<div class="avatar" id="avatar">U</div>
+<div><strong id="profileName">—</strong><small id="profileEmail">—</small></div>
+</div>
+<div class="grid">
+<div class="field"><label>Display Name</label><input id="myName" placeholder="Your name"></div>
+<div class="field"><label>Email Address</label><input id="myEmail" disabled></div>
+<div class="field"><label>Account Role</label><input id="myRole" disabled></div>
+</div>
+<div class="actions"><button class="primary" id="saveProfile">Update Profile</button></div>
+<div id="profileMessage"></div>
+</section>
+</main>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,updateDoc,collection,getDocs,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={
+ apiKey:"AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+ authDomain:"smile-business-os.firebaseapp.com",
+ projectId:"smile-business-os",
+ storageBucket:"smile-business-os.firebasestorage.app",
+ messagingSenderId:"114356400630",
+ appId:"1:114356400630:web:96fc9d07baaf3a504c17d7",
+ measurementId:"G-73WD9V05ZZ"
+};
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+let currentUser=null;
+let currentProfile=null;
+let staffRecords=[];
+
+function message(id,text,error=false){
+ $(id).textContent=text;
+ $(id).className=error?"error-msg":"success-msg";
+}
+function switchTab(tab){
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+ ["company","staff","account"].forEach(name=>{
+  $(name+"Section").classList.toggle("hidden",name!==tab);
+ });
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchTab(b.dataset.tab)));
+
+async function loadCompany(){
+ const snap=await getDoc(doc(db,"companySettings","main"));
+ if(!snap.exists())return;
+ const d=snap.data();
+ const fields={
+  companyName:"companyName",companyEmail:"companyEmail",companyPhone:"companyPhone",
+  companyWebsite:"companyWebsite",gstin:"gstin",pan:"pan",businessType:"businessType",
+  state:"state",address:"address",city:"city",pin:"pin"
+ };
+ Object.entries(fields).forEach(([field,id])=>$(id).value=d[field]||"");
+}
+$("companyForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const data={
+  companyName:$("companyName").value.trim(),
+  companyEmail:$("companyEmail").value.trim(),
+  companyPhone:$("companyPhone").value.trim(),
+  companyWebsite:$("companyWebsite").value.trim(),
+  gstin:$("gstin").value.trim().toUpperCase(),
+  pan:$("pan").value.trim().toUpperCase(),
+  businessType:$("businessType").value,
+  state:$("state").value.trim(),
+  address:$("address").value.trim(),
+  city:$("city").value.trim(),
+  pin:$("pin").value.trim(),
+  updatedAt:serverTimestamp(),
+  updatedBy:currentUser.uid
+ };
+ if(data.gstin&&!/^[0-9A-Z]{15}$/.test(data.gstin)){
+  message("companyMessage","Please check the GSTIN format.",true);return;
+ }
+ if(data.pan&&!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(data.pan)){
+  message("companyMessage","Please check the PAN format.",true);return;
+ }
+ try{
+  await setDoc(doc(db,"companySettings","main"),data,{merge:true});
+  message("companyMessage","Company details saved successfully.");
+ }catch(err){message("companyMessage","Save failed: "+err.message,true)}
+});
+
+async function loadStaff(){
+ $("staffRows").innerHTML='<tr><td colspan="5" class="empty">Loading staff...</td></tr>';
+ const snap=await getDocs(collection(db,"users"));
+ staffRecords=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.role==="staff");
+ if(!staffRecords.length){
+  $("staffRows").innerHTML='<tr><td colspan="5" class="empty">No staff accounts found.</td></tr>';return;
+ }
+ $("staffRows").innerHTML=staffRecords.map(u=>`
+ <tr>
+ <td>${escapeHTML(u.name||"Staff")}</td>
+ <td>${escapeHTML(u.email||"—")}</td>
+ <td>Staff</td>
+ <td><span class="badge ${u.active===false?"off":""}">${u.active===false?"Inactive":"Active"}</span></td>
+ <td><button class="${u.active===false?"primary":"danger"}" data-toggle="${escapeHTML(u.id)}" data-active="${u.active===false?"false":"true"}">${u.active===false?"Activate":"Deactivate"}</button></td>
+ </tr>`).join("");
+}
+function escapeHTML(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+$("staffRows").addEventListener("click",async e=>{
+ const btn=e.target.closest("[data-toggle]");
+ if(!btn)return;
+ const id=btn.dataset.toggle;
+ const willActivate=btn.dataset.active==="false";
+ const staff=staffRecords.find(x=>x.id===id);
+ if(!staff)return;
+ if(!confirm(`${willActivate?"Activate":"Deactivate"} ${staff.name||staff.email||"this staff account"}?`))return;
+ try{
+  await updateDoc(doc(db,"users",id),{active:willActivate,updatedAt:serverTimestamp()});
+  message("staffMessage","Staff account status updated.");
+  await loadStaff();
+ }catch(err){message("staffMessage","Update failed: "+err.message,true)}
+});
+
+function showProfile(){
+ const name=currentProfile.name||"";
+ $("profileName").textContent=name||"User";
+ $("profileEmail").textContent=currentUser.email||"";
+ $("avatar").textContent=(name||currentUser.email||"U").charAt(0).toUpperCase();
+ $("myName").value=name;
+ $("myEmail").value=currentUser.email||"";
+ $("myRole").value=currentProfile.role||"staff";
+}
+$("saveProfile").addEventListener("click",async()=>{
+ const name=$("myName").value.trim();
+ if(!name){message("profileMessage","Please enter your name.",true);return}
+ try{
+  await updateDoc(doc(db,"users",currentUser.uid),{name,updatedAt:serverTimestamp()});
+  currentProfile.name=name;showProfile();
+  $("userInfo").textContent=name;
+  message("profileMessage","Profile updated successfully.");
+ }catch(err){message("profileMessage","Update failed: "+err.message,true)}
+});
+
+$("logoutBtn").addEventListener("click",async e=>{
+ e.preventDefault();await signOut(auth);location.href="index.html";
+});
+
+onAuthStateChanged(auth,async user=>{
+ if(!user){location.href="index.html";return}
+ currentUser=user;
+ try{
+  const snap=await getDoc(doc(db,"users",user.uid));
+  if(!snap.exists()){await signOut(auth);location.href="index.html";return}
+  currentProfile=snap.data();
+  if(currentProfile.role!=="admin"||currentProfile.active===false){
+   alert("Settings access is available to active administrators only.");
+   location.href="dashboard.html";return;
+  }
+  $("userInfo").textContent=currentProfile.name||user.email;
+  showProfile();
+  await Promise.all([loadCompany(),loadStaff()]);
+ }catch(err){
+  message("companyMessage","Unable to load settings: "+err.message,true);
+ }
+});
+</script>
+</body>
+</html>
