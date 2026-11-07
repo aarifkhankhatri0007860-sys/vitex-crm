@@ -1,0 +1,711 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#105fc7">
+  <meta name="description" content="Vitex CRM - Business Management System">
+  <title>Vitex CRM | Secure Login</title>
+
+  <style>
+    :root {
+      --primary: #145fc5;
+      --primary-dark: #104da2;
+      --bg: #f3f7fd;
+      --text: #172b4d;
+      --muted: #718096;
+      --border: #e2e9f2;
+      --white: #fff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+    }
+
+    .left-panel {
+      background: linear-gradient(145deg, #0d4da8, #1678df);
+      color: white;
+      padding: 65px 9%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::before,
+    .left-panel::after {
+      content: "";
+      position: absolute;
+      border: 1px solid #ffffff20;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .left-panel::before {
+      width: 420px;
+      height: 420px;
+      right: -180px;
+      top: 10%;
+    }
+
+    .left-panel::after {
+      width: 580px;
+      height: 580px;
+      right: -260px;
+      top: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      background: white;
+      color: var(--primary);
+      border-radius: 13px;
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .brand-name {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      opacity: .8;
+      margin-top: 3px;
+    }
+
+    .intro {
+      max-width: 520px;
+      position: relative;
+      z-index: 1;
+      padding: 55px 0;
+    }
+
+    .intro-tag {
+      display: inline-block;
+      padding: 8px 13px;
+      background: #ffffff1c;
+      border: 1px solid #ffffff35;
+      border-radius: 30px;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .intro h1 {
+      font-size: clamp(32px, 4vw, 49px);
+      line-height: 1.17;
+      margin: 0 0 20px;
+      letter-spacing: -1.2px;
+    }
+
+    .intro p {
+      color: #e2edff;
+      line-height: 1.8;
+      font-size: 15px;
+      max-width: 440px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      position: relative;
+      z-index: 1;
+      max-width: 450px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #eef5ff;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      background: #ffffff20;
+      border-radius: 9px;
+    }
+
+    .left-footer {
+      font-size: 11px;
+      color: #d7e7ff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .right-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 35px 22px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 410px;
+      background: white;
+      padding: 38px;
+      border: 1px solid #eaf0f7;
+      border-radius: 19px;
+      box-shadow: 0 15px 50px #173c6810;
+    }
+
+    .mobile-brand {
+      display: none;
+    }
+
+    .login-heading h2 {
+      margin: 0 0 8px;
+      font-size: 27px;
+      letter-spacing: -.5px;
+    }
+
+    .login-heading p {
+      color: var(--muted);
+      margin: 0 0 28px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .field {
+      margin-bottom: 19px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 14px 45px 14px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+      transition: .2s;
+    }
+
+    .field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px #145fc51a;
+    }
+
+    .field input::placeholder {
+      color: #a0aec0;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: #718096;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 6px;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 22px;
+      font-size: 12px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #66758a;
+    }
+
+    .remember input {
+      accent-color: var(--primary);
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .login-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 15px;
+      background: var(--primary);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .login-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .login-btn:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 9px;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .message.error {
+      display: block;
+      color: #a82929;
+      background: #fff0f0;
+      border: 1px solid #ffdada;
+    }
+
+    .message.success {
+      display: block;
+      color: #176c40;
+      background: #edfff4;
+      border: 1px solid #c9f0d8;
+    }
+
+    .security-note {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin-top: 25px;
+      padding: 13px;
+      background: #f4f8ff;
+      border-radius: 10px;
+      color: #63748c;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .bottom-note {
+      text-align: center;
+      color: #9aa6b5;
+      font-size: 11px;
+      margin-top: 27px;
+    }
+
+    @media(max-width: 850px) {
+      .page {
+        grid-template-columns: 1fr;
+      }
+
+      .left-panel {
+        display: none;
+      }
+
+      .right-panel {
+        min-height: 100vh;
+        padding: 25px 16px;
+        background: linear-gradient(180deg, #eaf3ff, #f7faff);
+      }
+
+      .login-card {
+        padding: 30px 24px;
+      }
+
+      .mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 35px;
+      }
+
+      .mobile-brand .brand-logo {
+        background: var(--primary);
+        color: white;
+      }
+    }
+
+    @media(max-width: 380px) {
+      .login-card { padding: 25px 18px; }
+      .form-options { font-size: 11px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <section class="left-panel">
+      <div class="brand">
+        <div class="brand-logo">V</div>
+        <div>
+          <div class="brand-name">VITEX CRM</div>
+          <div class="brand-subtitle">BUSINESS MANAGEMENT SYSTEM</div>
+        </div>
+      </div>
+
+      <div class="intro">
+        <span class="intro-tag">YOUR BUSINESS CONTROL CENTER</span>
+        <h1>Manage your business with confidence.</h1>
+        <p>
+          Manage customers, orders, inventory, billing, shipping and
+          team activities from one organised workspace.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <span class="feature-icon">▦</span>
+            <span>Smart Dashboard</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">♙</span>
+            <span>Customer Management</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">▤</span>
+            <span>Orders & Billing</span>
+          </div>
+          <div class="feature">
+            <span class="feature-icon">↗</span>
+            <span>Business Reports</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="left-footer">
+        Secure business workspace · Vitex CRM
+      </div>
+    </section>
+
+    <section class="right-panel">
+      <main class="login-card">
+
+        <div class="mobile-brand">
+          <div class="brand-logo">V</div>
+          <div>
+            <div class="brand-name" style="color:#145fc5">VITEX CRM</div>
+            <div class="brand-subtitle" style="color:#718096">
+              BUSINESS MANAGEMENT SYSTEM
+            </div>
+          </div>
+        </div>
+
+        <div class="login-heading">
+          <h2>Welcome back</h2>
+          <p>Sign in to access your business workspace.</p>
+        </div>
+
+        <form id="loginForm">
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your registered email"
+              autocomplete="username"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              >
+              <button
+                class="toggle-password"
+                type="button"
+                id="togglePassword"
+              >Show</button>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="remember">
+              <input type="checkbox" id="rememberMe">
+              Remember email
+            </label>
+
+            <a href="#" id="forgotPassword">Forgot password?</a>
+          </div>
+
+          <button class="login-btn" id="loginBtn" type="submit">
+            Sign In to Vitex CRM
+          </button>
+
+          <div id="message" class="message" role="status"></div>
+        </form>
+
+        <div class="security-note">
+          <span>🔒</span>
+          <span>
+            Secure access for authorised Admin and Staff accounts.
+            Your account permissions are verified through Firebase.
+          </span>
+        </div>
+
+        <div class="bottom-note">
+          © 2026 Vitex CRM. All rights reserved.
+        </div>
+      </main>
+    </section>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase project configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyArcvyvNAOKipPZB0YEfSeoeN9_k-8JznQ",
+      authDomain: "smile-business-os.firebaseapp.com",
+      projectId: "smile-business-os",
+      storageBucket: "smile-business-os.firebasestorage.app",
+      messagingSenderId: "114356400630",
+      appId: "1:114356400630:web:96fc9d07baaf3a504c17d7",
+      measurementId: "G-73WD9V05ZZ"
+    };
+
+    // Initialise Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const loginForm = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("loginBtn");
+    const messageBox = document.getElementById("message");
+
+    let isProcessing = false;
+
+    // Show messages
+    function showMessage(message, type = "error") {
+      messageBox.textContent = message;
+      messageBox.className = "message " + type;
+    }
+
+    function clearMessage() {
+      messageBox.textContent = "";
+      messageBox.className = "message";
+    }
+
+    // Show / hide password
+    document.getElementById("togglePassword").addEventListener("click", function () {
+      const isPassword = passwordInput.type === "password";
+      passwordInput.type = isPassword ? "text" : "password";
+      this.textContent = isPassword ? "Hide" : "Show";
+    });
+
+    // Remember email on this browser
+    const savedEmail = localStorage.getItem("vitex_saved_email");
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      document.getElementById("rememberMe").checked = true;
+    }
+
+    // Friendly Firebase error messages
+    function friendlyError(error) {
+      const errors = {
+        "auth/invalid-email": "Please enter a valid email address.",
+        "auth/user-not-found": "No account found with this email.",
+        "auth/wrong-password": "Incorrect password.",
+        "auth/invalid-credential": "Email or password is incorrect.",
+        "auth/too-many-requests": "Too many attempts. Please try again later.",
+        "auth/network-request-failed": "Network error. Please check your internet.",
+        "auth/user-disabled": "This account has been disabled. Contact Admin."
+      };
+
+      return errors[error.code] || "Something went wrong. Please try again.";
+    }
+
+    // Verify the user's Firestore role
+    async function verifyUserRole(user) {
+      const userRef = db.collection("users").doc(user.uid);
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        throw new Error(
+          "USER_PROFILE_MISSING: Admin has not created your CRM role profile."
+        );
+      }
+
+      const userData = userDoc.data();
+      const role = String(userData.role || "").toLowerCase();
+
+      if (!["admin", "staff"].includes(role)) {
+        throw new Error("INVALID_ROLE: Your account role is not authorised.");
+      }
+
+      if (userData.active === false) {
+        throw new Error("ACCOUNT_DISABLED: Your CRM account is inactive.");
+      }
+
+      return role;
+    }
+
+    // Login
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      if (isProcessing) return;
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showMessage("Please enter email and password.");
+        return;
+      }
+
+      isProcessing = true;
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Verifying account...";
+      clearMessage();
+
+      try {
+        const result = await auth.signInWithEmailAndPassword(email, password);
+
+        const role = await verifyUserRole(result.user);
+
+        if (document.getElementById("rememberMe").checked) {
+          localStorage.setItem("vitex_saved_email", email);
+        } else {
+          localStorage.removeItem("vitex_saved_email");
+        }
+
+        // Dashboard will read the verified role from Firestore.
+        sessionStorage.setItem("vitex_login_role", role);
+
+        showMessage("Login successful. Opening your workspace...", "success");
+
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 500);
+
+      } catch (error) {
+        console.error("Login error:", error);
+
+        if (
+          error.message.startsWith("USER_PROFILE_MISSING:") ||
+          error.message.startsWith("INVALID_ROLE:") ||
+          error.message.startsWith("ACCOUNT_DISABLED:")
+        ) {
+          if (auth.currentUser) {
+            await auth.signOut();
+          }
+          showMessage(error.message.split(":")[1].trim());
+        } else {
+          showMessage(friendlyError(error));
+        }
+
+      } finally {
+        isProcessing = false;
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Sign In to Vitex CRM";
+      }
+    });
+
+    // Forgot password
+    document.getElementById("forgotPassword").addEventListener("click", async function (event) {
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+
+      if (!email) {
+        showMessage("Please enter your registered email first.");
+        emailInput.focus();
+        return;
+      }
+
+      clearMessage();
+
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showMessage(
+          "Password reset email sent. Please check your inbox.",
+          "success"
+        );
+      } catch (error) {
+        showMessage(friendlyError(error));
+      }
+    });
+
+    // Existing logged-in session
+    auth.onAuthStateChanged(async function (user) {
+      if (!user || isProcessing) return;
+
+      try {
+        const role = await verifyUserRole(user);
+        sessionStorage.setItem("vitex_login_role", role);
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        console.error("Session verification:", error);
+        await auth.signOut();
+        showMessage("Your session needs verification. Please sign in again.");
+      }
+    });
+  </script>
+</body>
+</html>
